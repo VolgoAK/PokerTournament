@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">PokerTournament</string>
+    <string name="start_service">Start service</string>
+    <string name="blinds_is">Current blinds</string>
+    <string name="increase_in">Increase in</string>
+    <string name="blinds_increase">Blinds increase</string>
+    <string name="new_blinds">New blinds</string>
+
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+
+    <string-array name="blinds_mid">
+        <item>5/10</item>
+        <item>10/20</item>
+        <item>20/40</item>
+        <item>30/60</item>
+        <item>50/100</item>
+        <item>75/150</item>
+    </string-array>
+
+</resources>
