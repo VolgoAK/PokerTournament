@@ -33,7 +33,7 @@ public class NotificationUtil {
     public static final int NOTIFICATION_COD = 1237;
 
     //first create simple notification
-    public static void showNotification(Context context, Bundle extra){
+    public static Notification createNotification(Context context, Bundle extra){
 
         Notification.Builder builder = new Notification.Builder(context)
                 .setPriority(Notification.PRIORITY_HIGH)
@@ -61,10 +61,7 @@ public class NotificationUtil {
         builder.setContentTitle(title);
         builder.setContentText(text);
 
-
-        Notification notification = builder.build();
-        NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        manager.notify(NOTIFICATION_COD, notification);
+        return builder.build();
     }
     // TODO: 14.01.2017 add silluete icon for version 21
 

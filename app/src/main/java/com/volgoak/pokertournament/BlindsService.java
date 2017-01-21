@@ -1,17 +1,15 @@
 package com.volgoak.pokertournament;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.volgoak.pokertournament.utils.NotificationUtil;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by Volgoak on 14.01.2017.
@@ -22,196 +20,171 @@ public class BlindsService extends Service {
     public static final String TAG = "BlindsService";
 
     public static final String START_GAME_ACTION = "start_game";
-    public static final String GET_INFO_ACTION = "get_info";
-    public static final String START_ACTION = "start_tournament";
-    public static final String PAUSE_ACTION = "pause_tournament";
-    public static final String RESUME_ACTION = "resume_tournament";
-    public static final String STOP_ACTION = "stop_tournament";
+    //public static final String GET_INFO_ACTION = "get_info";
 
     public static final String EXTRA_ROUND_TIME = "round_time";
+    public static final String EXTRA_BLINDS_STRUCTURE = "blinds_structure";
+    public static final String EXTRA_START_BLINDS = "start_blinds";
+    public static final String EXTRA_START_TIME = "start_time";
+    public static final String EXTRA_BLINDS_TYPE = "blinds_type";
 
-    private static ExecutorService mExecutor = Executors.newFixedThreadPool(1);
-    private static Thread gameThread;
+    public static final String BLINDS_SLOW = "blinds_slow";
+    public static final String BLINDS_MEDIUM = "blinds_medium";
+    public static final String BLINDS_FAST = "blinds_fast";
 
-    private static volatile boolean tournamentInProgress;
-    //only for test version
-    private static String blinds = "5/10";
+    private static Thread sGameThread;
 
-    private static int round;
+    private static volatile boolean sTournamentInProgress;
 
-    private static long roundTime ;
+    private static String sBlinds;
 
-    private long increaseTime;
+    private static int sRoundNum;
 
-    private static long pauseLeftTime;
-    private static boolean paused;
+    private static int sBlindsResource;
 
-    // TODO: 19.01.2017 remove to onstart
-    /*protected void onHandleIntent(Intent intent) {
-        String taskAction = intent.getAction();
-        if (START_GAME_ACTION.equals(taskAction)) {
-            Log.d(TAG, "onHandleIntent: " + taskAction);
-            runAGame(intent);
-        } else if (GET_INFO_ACTION.equals(taskAction)) {
-            sendInfo();
-        }
-    }*/
+    private static long sRoundTime;
+    private static long sIncreaseTime;
+    private static long sPauseLeftTime;
 
+    /**
+     * For start timer intent param must have action START_GAME_ACTION and include
+     * blinds type as a string,
+     * round time as a long
+     * start time as a long
+     * start blind as a string
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String taskAction = intent.getAction();
         Log.d(TAG, "onStartCommand: action " + taskAction);
-        if (!tournamentInProgress && START_GAME_ACTION.equals(taskAction)) {
-            roundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
-            String a = intent.getStringExtra("a");
-            Log.d(TAG, "onStartCommand: message is " + a);
+        if (!sTournamentInProgress && START_GAME_ACTION.equals(taskAction)) {
             startNewGame(intent);
             return START_REDELIVER_INTENT;
-        }else if(PAUSE_ACTION.equals(taskAction)){
-            pause();
-        }else if(RESUME_ACTION.equals(taskAction)){
-            resume();
-        }else if(STOP_ACTION.equals(taskAction)){
-            stopTournament();
         }
-        return  START_STICKY_COMPATIBILITY;
+        return  START_REDELIVER_INTENT;
     }
 
     @Override
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
-        tournamentInProgress = false;
-        //super.onDestroy();
-    }
-
-    private void stopTournament(){
-        tournamentInProgress = false;
-        gameThread.interrupt();
-        round = 0;
-        stopSelf();
-    }
-
-    private void pause(){
-        pauseLeftTime = increaseTime - System.currentTimeMillis();
-        tournamentInProgress = false;
-        gameThread.interrupt();
-        paused = true;
-    }
-
-    private void resume(){
-        increaseTime = System.currentTimeMillis() + pauseLeftTime;
-        tournamentInProgress = true;
-        //mExecutor.execute(new BlindTimer());
-        gameThread = new Thread(new BlindTimer());
-        gameThread.start();
-        paused = false;
-    }
-
-    private void startNewGame(Intent intent){
-        //test time make changeable
-        Log.d(TAG, "startGame: ");
-        increaseTime = System.currentTimeMillis() + roundTime;
-        // TODO: 19.01.2017 how to save time in case service was destroyed
-        tournamentInProgress = true;
-        //mExecutor.execute(new BlindTimer());
-        gameThread = new Thread(new BlindTimer());
-        gameThread.start();
-    }
-
-    private void startNextRound(){
-        //mExecutor.shutdown();
-        round++;
-        tournamentInProgress = true;
-        Log.d(TAG, "startNextRound: round is " + round);
-        blinds = getResources().getStringArray(R.array.blinds_mid)[round];
-        increaseTime = System.currentTimeMillis() + roundTime;
-        gameThread = new Thread(new BlindTimer());
-        gameThread.start();
+        sTournamentInProgress = false;
     }
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+       return new ITimer();
     }
 
-    public void sendNotification(String notificationType){
+    private void startNewGame(Intent intent){
+        //test time make changeable
+        Log.d(TAG, "startGame: ");
+        sRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
+        sIncreaseTime = System.currentTimeMillis() + sRoundTime;
+        // TODO: 19.01.2017 how to save time in case service was destroyed
+        // TODO: 21.01.2017 decide what is sRoundNum number by start sBlinds
+
+        String blindsType = intent.getStringExtra(EXTRA_BLINDS_TYPE);
+        if(BLINDS_SLOW.equals(blindsType))sBlindsResource = R.array.blinds_slow;
+        else if(BLINDS_MEDIUM.equals(blindsType)) sBlindsResource = R.array.blinds_mid;
+        else if(BLINDS_FAST.equals(blindsType)) sBlindsResource = R.array.blinds_fast;
+
+        sBlinds = getResources().getStringArray(sBlindsResource)[0];
+
+        sTournamentInProgress = true;
+        sGameThread = new Thread(new BlindTimerThread());
+        sGameThread.start();
+    }
+
+    private void startNextRound(){
+        //mExecutor.shutdown();
+        sRoundNum++;
+        sTournamentInProgress = true;
+        Log.d(TAG, "startNextRound: sRoundNum is " + sRoundNum);
+        sBlinds = getResources().getStringArray(sBlindsResource)[sRoundNum];
+        sIncreaseTime = System.currentTimeMillis() + sRoundTime;
+        sGameThread = new Thread(new BlindTimerThread());
+        sGameThread.start();
+    }
+
+    private void stopTournament(){
+        sTournamentInProgress = false;
+        sGameThread.interrupt();
+        sRoundNum = 0;
+        stopSelf();
+    }
+
+    private void pause(){
+        sPauseLeftTime = sIncreaseTime - System.currentTimeMillis();
+        sTournamentInProgress = false;
+        sGameThread.interrupt();
+    }
+
+    private void resume(){
+        sIncreaseTime = System.currentTimeMillis() + sPauseLeftTime;
+        sTournamentInProgress = true;
+        //mExecutor.execute(new BlindTimerThread());
+        sGameThread = new Thread(new BlindTimerThread());
+        sGameThread.start();
+    }
+
+
+
+    public void showNotification(String notificationType){
         Bundle notBundle = new Bundle();
         //add action - show timer
         String action = NotificationUtil.ROUND_ENDED.equals(notificationType)
                 ? NotificationUtil.ROUND_ENDED : NotificationUtil.SHOW_TIMER;
         notBundle.putString(NotificationUtil.EXTRA_ACTION, action);
         //add time to increase
-        long timeToIncrease = increaseTime - System.currentTimeMillis();
+        long timeToIncrease = sIncreaseTime - System.currentTimeMillis();
         notBundle.putLong(NotificationUtil.EXTRA_TIME, timeToIncrease);
-        //add info about blinds
-        notBundle.putString(NotificationUtil.EXTRA_BLINDS, blinds);
+        //add info about sBlinds
+        notBundle.putString(NotificationUtil.EXTRA_BLINDS, sBlinds);
 
-        NotificationUtil.showNotification(this, notBundle);
+        Notification notification = NotificationUtil.createNotification(this, notBundle);
+        startForeground(NotificationUtil.NOTIFICATION_COD, notification);
     }
 
-    private class BlindTimer implements Runnable{
+    private class BlindTimerThread implements Runnable{
         @Override
         public void run() {
             Log.d(TAG, "run: ");
-            long timeToRound = increaseTime - System.currentTimeMillis();
-            while (timeToRound > 0){
+            long timeToRound = sIncreaseTime - System.currentTimeMillis();
+            while (sTournamentInProgress){
                 if(timeToRound > 1000){
                     try{
                         Thread.sleep(1000);
                     }catch (InterruptedException ex){
                         ex.printStackTrace();
                     }
-                    sendNotification(NotificationUtil.SHOW_TIMER);
-                    timeToRound = increaseTime - System.currentTimeMillis();
+                    showNotification(NotificationUtil.SHOW_TIMER);
+                    timeToRound = sIncreaseTime - System.currentTimeMillis();
                 }else{
                     try{
                         Thread.sleep(timeToRound);
                     }catch (InterruptedException ex){
                         ex.printStackTrace();
                     }
-                    sendNotification(NotificationUtil.ROUND_ENDED);
-                    tournamentInProgress = false;
+                    showNotification(NotificationUtil.ROUND_ENDED);
+                    sTournamentInProgress = false;
+                    startNextRound();
+                    break;
                 }
             }
-            startNextRound();
         }
     }
 
-    private class BlindTimerTask extends AsyncTask<Void, Void, Void>{
+    //Binder class with callback methods
+    private class ITimer extends Binder implements BlindTimer{
         @Override
-        protected Void doInBackground(Void... params) {
-            long timeToRound = increaseTime - System.currentTimeMillis();
-            while (timeToRound > 0){
-                if(timeToRound > 1000){
-                    try{
-                        Thread.sleep(1000);
-                    }catch (InterruptedException ex){
-                        ex.printStackTrace();
-                    }
-                    publishProgress();
-                    timeToRound = increaseTime - System.currentTimeMillis();
-                }else{
-                    try{
-                        Thread.sleep(timeToRound);
-                    }catch (InterruptedException ex){
-                        ex.printStackTrace();
-                    }
-                    sendNotification(NotificationUtil.ROUND_ENDED);
-                }
-            }
-
-            return null;
+        public void pause() {
+            BlindsService.this.pause();
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
-            sendNotification(NotificationUtil.SHOW_TIMER);
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            startNextRound();
+        public void resume() {
+            BlindsService.this.resume();
         }
     }
 }

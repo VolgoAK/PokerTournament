@@ -34,9 +34,6 @@ public class TournamentActivity extends AppCompatActivity {
         mReceiver = new BlindsBroadCastReceiver();
         mIntentFilter = new IntentFilter(RECEIVER_CODE);
 
-        Intent intent = new Intent(TournamentActivity.this, BlindsService.class);
-        intent.setAction(BlindsService.GET_INFO_ACTION);
-        startService(intent);
     }
 
     @Override
