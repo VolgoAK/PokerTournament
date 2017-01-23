@@ -20,7 +20,6 @@ public class BlindsService extends Service {
     public static final String TAG = "BlindsService";
 
     public static final String START_GAME_ACTION = "start_game";
-    //public static final String GET_INFO_ACTION = "get_info";
 
     public static final String EXTRA_ROUND_TIME = "round_time";
     public static final String EXTRA_BLINDS_STRUCTURE = "blinds_structure";
@@ -31,6 +30,7 @@ public class BlindsService extends Service {
     private static Thread sGameThread;
 
     private static volatile boolean sTournamentInProgress;
+    private static boolean binded;
 
     private static String sBlinds;
 
@@ -72,13 +72,21 @@ public class BlindsService extends Service {
     @Override
     public IBinder onBind(Intent intent) {
         Log.d(TAG, "onBind: ");
+        binded = true;
        return new ITimer();
     }
 
     @Override
     public boolean onUnbind(Intent intent) {
         Log.d(TAG, "onUnbind: ");
-        return super.onUnbind(intent);
+        binded = false;
+        return true;
+    }
+
+    @Override
+    public void onRebind(Intent intent) {
+        Log.d(TAG, "onRebind: ");
+        binded = true;
     }
 
     private void startNewGame(Intent intent){
@@ -115,18 +123,18 @@ public class BlindsService extends Service {
         stopSelf();
     }
 
-    private void pause(){
-        sPauseLeftTime = sIncreaseTime - System.currentTimeMillis();
-        sTournamentInProgress = false;
-        sGameThread.interrupt();
-    }
-
-    private void resume(){
-        sIncreaseTime = System.currentTimeMillis() + sPauseLeftTime;
-        sTournamentInProgress = true;
-        //mExecutor.execute(new BlindTimerThread());
-        sGameThread = new Thread(new BlindTimerThread());
-        sGameThread.start();
+    private void changeState(){
+        if(sTournamentInProgress){
+            sPauseLeftTime = sIncreaseTime - System.currentTimeMillis();
+            sTournamentInProgress = false;
+            sGameThread.interrupt();
+        }else{
+            sIncreaseTime = System.currentTimeMillis() + sPauseLeftTime;
+            sTournamentInProgress = true;
+            //mExecutor.execute(new BlindTimerThread());
+            sGameThread = new Thread(new BlindTimerThread());
+            sGameThread.start();
+        }
     }
 
 
@@ -145,6 +153,13 @@ public class BlindsService extends Service {
 
         Notification notification = NotificationUtil.createNotification(this, notBundle);
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
+
+        if(binded){
+            String timeMessage = NotificationUtil.parseTime(timeToIncrease);
+            Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
+            intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
+            sendBroadcast(intent);
+        }
     }
 
     private class BlindTimerThread implements Runnable{
@@ -178,15 +193,9 @@ public class BlindsService extends Service {
 
     //Binder class with callback methods
     private class ITimer extends Binder implements BlindTimer{
-        @Override
-        public void pause() {
-            BlindsService.this.pause();
-        }
-
-        @Override
-        public void resume() {
-            BlindsService.this.resume();
-        }
+       public void changeState(){
+          BlindsService.this.changeState();
+       }
     }
 }
 

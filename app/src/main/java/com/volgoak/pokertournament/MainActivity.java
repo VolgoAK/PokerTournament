@@ -27,6 +27,8 @@ public class MainActivity extends AppCompatActivity{
     private ArrayAdapter<String> mStructureAdapter;
     private ArrayAdapter<String> mMinutsAdapter;
 
+    // TODO: 23.01.2017 if service is running start tournament activity
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,13 +74,17 @@ public class MainActivity extends AppCompatActivity{
             case 2 :
                 blindsArray = getResources().getStringArray(R.array.blinds_fast);
         }
-
+        //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
         intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);
         intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
         intent.setAction(BlindsService.START_GAME_ACTION);
 
         startService(intent);
+
+        //Start tournament activity
+        Intent activityIntent = new Intent(this, TournamentActivity.class);
+        startActivity(activityIntent);
     }
 
 }

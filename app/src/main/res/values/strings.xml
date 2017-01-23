@@ -8,6 +8,7 @@
     <string name="blinds_structure">Blinds structure</string>
     <string name="round_time">Round time</string>
     <string name="start">start</string>
+    <string name="stop">Stop</string>
 
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>

@@ -77,7 +77,7 @@ public class NotificationUtil {
         return alarmSound;
     }
 
-    private static String parseTime(long time){
+    public static String parseTime(long time){
         int sec = (int)(time/1000 % 60);
         int min = (int)(time/1000/60);
 
