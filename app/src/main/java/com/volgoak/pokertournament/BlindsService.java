@@ -26,11 +26,7 @@ public class BlindsService extends Service {
     public static final String EXTRA_BLINDS_STRUCTURE = "blinds_structure";
     public static final String EXTRA_START_BLINDS = "start_blinds";
     public static final String EXTRA_START_TIME = "start_time";
-    public static final String EXTRA_BLINDS_TYPE = "blinds_type";
-
-    public static final String BLINDS_SLOW = "blinds_slow";
-    public static final String BLINDS_MEDIUM = "blinds_medium";
-    public static final String BLINDS_FAST = "blinds_fast";
+    public static final String EXTRA_BLINDS_ARRAY = "blinds_array";
 
     private static Thread sGameThread;
 
@@ -46,9 +42,11 @@ public class BlindsService extends Service {
     private static long sIncreaseTime;
     private static long sPauseLeftTime;
 
+    private static String[] sBlindsArray;
+
     /**
      * For start timer intent param must have action START_GAME_ACTION and include
-     * blinds type as a string,
+     * blinds as an array of strings,
      * round time as a long
      * start time as a long
      * start blind as a string
@@ -73,7 +71,14 @@ public class BlindsService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
+        Log.d(TAG, "onBind: ");
        return new ITimer();
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        Log.d(TAG, "onUnbind: ");
+        return super.onUnbind(intent);
     }
 
     private void startNewGame(Intent intent){
@@ -84,12 +89,8 @@ public class BlindsService extends Service {
         // TODO: 19.01.2017 how to save time in case service was destroyed
         // TODO: 21.01.2017 decide what is sRoundNum number by start sBlinds
 
-        String blindsType = intent.getStringExtra(EXTRA_BLINDS_TYPE);
-        if(BLINDS_SLOW.equals(blindsType))sBlindsResource = R.array.blinds_slow;
-        else if(BLINDS_MEDIUM.equals(blindsType)) sBlindsResource = R.array.blinds_mid;
-        else if(BLINDS_FAST.equals(blindsType)) sBlindsResource = R.array.blinds_fast;
-
-        sBlinds = getResources().getStringArray(sBlindsResource)[0];
+        sBlindsArray = intent.getStringArrayExtra(EXTRA_BLINDS_ARRAY);
+        sBlinds = sBlindsArray[0];
 
         sTournamentInProgress = true;
         sGameThread = new Thread(new BlindTimerThread());
@@ -101,7 +102,7 @@ public class BlindsService extends Service {
         sRoundNum++;
         sTournamentInProgress = true;
         Log.d(TAG, "startNextRound: sRoundNum is " + sRoundNum);
-        sBlinds = getResources().getStringArray(sBlindsResource)[sRoundNum];
+        sBlinds = sBlindsArray[sRoundNum];
         sIncreaseTime = System.currentTimeMillis() + sRoundTime;
         sGameThread = new Thread(new BlindTimerThread());
         sGameThread.start();

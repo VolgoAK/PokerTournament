@@ -81,6 +81,7 @@ public class NotificationUtil {
         int sec = (int)(time/1000 % 60);
         int min = (int)(time/1000/60);
 
-        return min + ":" + sec;
+        String timeString = String.format("%2d:%02d", min, sec);
+        return timeString;
     }
 }

@@ -5,9 +5,27 @@
     <string name="increase_in">Increase in</string>
     <string name="blinds_increase">Blinds increase</string>
     <string name="new_blinds">New blinds</string>
+    <string name="blinds_structure">Blinds structure</string>
+    <string name="round_time">Round time</string>
+    <string name="start">start</string>
 
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
+
+    <string-array name="blinds_structures">
+        <item>Slow</item>
+        <item>Medium</item>
+        <item>Fast</item>
+    </string-array>
+
+    <string-array name="time_for_round">
+        <item>5</item>
+        <item>7</item>
+        <item>10</item>
+        <item>12</item>
+        <item>15</item>
+        <item>20</item>
+    </string-array>
 
     <string-array name="blinds_slow">
         <item>5/10</item>

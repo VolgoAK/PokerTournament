@@ -4,79 +4,81 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 
-public class MainActivity extends AppCompatActivity implements ServiceConnection{
+import com.volgoak.pokertournament.databinding.ActivityMainBinding;
 
-    private BlindTimer mTimer;
+public class MainActivity extends AppCompatActivity{
+
+    public static final String TAG = "MainActivity";
+
+    private ActivityMainBinding mBinding;
+    // TODO: 23.01.2017 make local
+    private ArrayAdapter<String> mStructureAdapter;
+    private ArrayAdapter<String> mMinutsAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Button buttonStart = (Button) findViewById(R.id.button);
 
-        buttonStart.setOnClickListener(new View.OnClickListener() {
+        mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        //create arrayAdapter for minuteSpinner and link it to spinner
+        mMinutsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
+                 getResources().getStringArray(R.array.time_for_round));
+        mBinding.spRoundTimeMain.setAdapter(mMinutsAdapter);
+        //same with the structureSpinner
+        mStructureAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
+                getResources().getStringArray(R.array.blinds_structures));
+        mBinding.spBlindsStructureMain.setAdapter(mStructureAdapter);
+
+        //create listener for the start button
+        mBinding.btStartMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BlindsService.class);
-                intent.setAction(BlindsService.START_GAME_ACTION);
-                intent.putExtra(BlindsService.EXTRA_ROUND_TIME, 10000L);
-                intent.putExtra(BlindsService.EXTRA_BLINDS_TYPE, BlindsService.BLINDS_SLOW);
-                startService(intent);
-
-                bindService(new Intent(MainActivity.this, BlindsService.class), MainActivity.this, Context.BIND_AUTO_CREATE);
-
-            }
-        });
-
-        Button buttonStop = (Button) findViewById(R.id.button_stop);
-        buttonStop.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, BlindsService.class);
-                stopService(intent);
-            }
-        });
-
-
-        Button buttonPause = (Button) findViewById(R.id.bt_pause);
-        buttonPause.setEnabled(false);
-        buttonPause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTimer.pause();
-            }
-        });
-
-        Button buttonResume = (Button) findViewById(R.id.bt_resume);
-        buttonResume.setEnabled(false);
-        buttonResume.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mTimer.resume();
+                startGame();
             }
         });
     }
 
-    @Override
-    public void onServiceConnected(ComponentName name, IBinder service) {
-        mTimer = (BlindTimer) service;
-        findViewById(R.id.bt_pause).setEnabled(true);
-        findViewById(R.id.bt_resume).setEnabled(true);
-    }
+    private void startGame(){
+        String minutesString = mBinding.spRoundTimeMain.getSelectedItem().toString();
+        int minutesInt = Integer.parseInt(minutesString);
+        long roundTime = minutesInt * 60 * 1000;
 
-    @Override
-    public void onServiceDisconnected(ComponentName name) {
-        mTimer = null;
-    }
+        Log.d(TAG, "startGame: round time = " + roundTime);
 
+        int blindsStructureNum = mBinding.spBlindsStructureMain.getSelectedItemPosition();
+        String[] blindsArray = null;
+
+        switch (blindsStructureNum){
+            case 0 :
+                blindsArray = getResources().getStringArray(R.array.blinds_slow);
+                break;
+            case 1 :
+                blindsArray = getResources().getStringArray(R.array.blinds_mid);
+                break;
+            case 2 :
+                blindsArray = getResources().getStringArray(R.array.blinds_fast);
+        }
+
+        Intent intent = new Intent(this, BlindsService.class);
+        intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);
+        intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
+        intent.setAction(BlindsService.START_GAME_ACTION);
+
+        startService(intent);
+    }
 
 }
