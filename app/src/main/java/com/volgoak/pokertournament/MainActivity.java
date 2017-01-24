@@ -18,6 +18,10 @@ import android.widget.Button;
 
 import com.volgoak.pokertournament.databinding.ActivityMainBinding;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class MainActivity extends AppCompatActivity{
 
     public static final String TAG = "MainActivity";
@@ -26,6 +30,9 @@ public class MainActivity extends AppCompatActivity{
     // TODO: 23.01.2017 make local
     private ArrayAdapter<String> mStructureAdapter;
     private ArrayAdapter<String> mMinutsAdapter;
+
+    private List<String> mStructureList;
+    private List<String> mTimeList;
 
     // TODO: 23.01.2017 if service is running start tournament activity
 
@@ -37,13 +44,29 @@ public class MainActivity extends AppCompatActivity{
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         //create arrayAdapter for minuteSpinner and link it to spinner
-        mMinutsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
-                 getResources().getStringArray(R.array.time_for_round));
-        mBinding.spRoundTimeMain.setAdapter(mMinutsAdapter);
+        /*mMinutsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
+                 getResources().getStringArray(R.array.time_for_round));*/
+        String[] timeArray = getResources().getStringArray(R.array.time_for_round);
+        mTimeList = new ArrayList<>();
+        Collections.addAll(mTimeList, timeArray);
+
+        mBinding.wheelRoundTimeMain.setData(mTimeList);
+        mBinding.wheelRoundTimeMain.setCurved(true);
+        mBinding.wheelRoundTimeMain.setCyclic(true);
+        mBinding.wheelRoundTimeMain.setVisibleItemCount(4);
+        mBinding.wheelRoundTimeMain.setAtmospheric(true);
+        mBinding.wheelRoundTimeMain.setItemTextSize(48);
         //same with the structureSpinner
-        mStructureAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
-                getResources().getStringArray(R.array.blinds_structures));
-        mBinding.spBlindsStructureMain.setAdapter(mStructureAdapter);
+        String[] structureArray = getResources().getStringArray(R.array.blinds_structures);
+        mStructureList = new ArrayList<>();
+        Collections.addAll(mStructureList, structureArray);
+
+        mBinding.wheelBlindsStructureMain.setData(mStructureList);
+        mBinding.wheelBlindsStructureMain.setVisibleItemCount(4);
+        mBinding.wheelBlindsStructureMain.setCurved(true);
+        mBinding.wheelBlindsStructureMain.setCyclic(true);
+        mBinding.wheelBlindsStructureMain.setAtmospheric(true);
+        mBinding.wheelBlindsStructureMain.setItemTextSize(48);
 
         //create listener for the start button
         mBinding.btStartMain.setOnClickListener(new View.OnClickListener() {
@@ -55,11 +78,13 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void startGame(){
-        String minutesString = mBinding.spRoundTimeMain.getSelectedItem().toString();
+//        String minutesString = mBinding.spRoundTimeMain.getSelectedItem().toString();
+        int selectedMinuts = mBinding.wheelRoundTimeMain.getSelectedItemPosition();
+        String minutesString = mTimeList.get(selectedMinuts);
         int minutesInt = Integer.parseInt(minutesString);
         long roundTime = minutesInt * 60 * 1000;
 
-        int blindsStructureNum = mBinding.spBlindsStructureMain.getSelectedItemPosition();
+        int blindsStructureNum = mBinding.wheelBlindsStructureMain.getSelectedItemPosition();
         String[] blindsArray = null;
 
         switch (blindsStructureNum){
