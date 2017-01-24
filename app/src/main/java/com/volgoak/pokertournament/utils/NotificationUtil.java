@@ -2,6 +2,7 @@ package com.volgoak.pokertournament.utils;
 
 import android.app.Notification;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -13,6 +14,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.volgoak.pokertournament.R;
+import com.volgoak.pokertournament.TournamentActivity;
 
 import java.text.DateFormat;
 
@@ -39,7 +41,8 @@ public class NotificationUtil {
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setSmallIcon(R.drawable.poker_24p)
-                .setLargeIcon(largeIcon(context));
+                .setLargeIcon(largeIcon(context))
+                .setContentIntent(pendingIntent(context));
 
         String title = "";
         String text = "";
@@ -72,9 +75,16 @@ public class NotificationUtil {
     }
 
     private static Uri soundUri(Context context){
-        Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        //Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri alarmSound = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.increase_sound);
         Log.d(TAG, "soundUri: " + alarmSound);
         return alarmSound;
+    }
+
+    private static PendingIntent pendingIntent(Context context){
+        Intent intent = new Intent(context, TournamentActivity.class);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return pendingIntent;
     }
 
     public static String parseTime(long time){

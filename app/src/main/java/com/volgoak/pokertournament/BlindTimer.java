@@ -5,5 +5,6 @@ package com.volgoak.pokertournament;
  */
 
  interface BlindTimer {
-    void changeState();
+    boolean changeState();
+    void stop();
 }

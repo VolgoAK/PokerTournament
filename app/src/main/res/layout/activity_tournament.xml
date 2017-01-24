@@ -6,55 +6,89 @@
 <android.support.constraint.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.volgoak.pokertournament.TournamentActivity">
+    tools:context="com.volgoak.pokertournament.TournamentActivity"
+    android:background="@drawable/table_background">
 
     <TextView
-        tools:text="02:34"
+        android:text="00:00"
         android:id="@+id/tv_time_to_next_tournament"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+        android:textColor="@color/orange"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginTop="32dp" />
 
     <TextView
-        android:text="TextView"
+        android:text="@string/blinds_is"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_blinds_tournament"
-        android:layout_marginTop="8dp"
+        android:id="@+id/tv_blinds_title_tournament"
+        app:layout_constraintTop_toBottomOf="@+id/tv_current_blinds_tourn"
+        app:layout_constraintBottom_toTopOf="@+id/tv_current_blinds_tourn"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tv_current_blinds_tourn"
+        app:layout_constraintHorizontal_bias="0.49"
+        android:layout_marginStart="16dp" />
+
+    <TextView
+        android:text="0/0"
+        android:textColor="@android:color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_current_blinds_tourn"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
         app:layout_constraintTop_toBottomOf="@+id/tv_time_to_next_tournament"
+        app:layout_constraintRight_toRightOf="@+id/tv_time_to_next_tournament"
+        android:layout_marginTop="16dp"
         app:layout_constraintLeft_toLeftOf="@+id/tv_time_to_next_tournament" />
 
     <TextView
-        android:text="TextView"
+        android:text="@string/next_blinds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/tv_next_blinds_tournament"
-        app:layout_constraintRight_toRightOf="@+id/tv_blinds_tournament"
-        app:layout_constraintLeft_toLeftOf="@+id/tv_blinds_tournament"
+        android:id="@+id/tv_next_blinds_title_tournament"
+        app:layout_constraintRight_toRightOf="@+id/tv_blinds_title_tournament"
+        app:layout_constraintLeft_toLeftOf="@+id/tv_blinds_title_tournament"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_blinds_tournament" />
+        app:layout_constraintTop_toTopOf="@+id/tv_next_blinds_tour"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_next_blinds_tour"/>
+
+    <TextView
+        android:text="0/0"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_next_blinds_tour"
+        android:textColor="@android:color/black"
+        android:gravity="center_horizontal"
+        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        app:layout_constraintTop_toBottomOf="@+id/tv_current_blinds_tourn"
+        app:layout_constraintRight_toRightOf="@+id/tv_current_blinds_tourn"
+        app:layout_constraintLeft_toLeftOf="@+id/tv_current_blinds_tourn"
+        android:layout_marginTop="16dp" />
 
     <Button
         android:text="@string/pause"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bt_pause_tournament"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/tv_next_blinds_tournament"
-        android:layout_marginStart="16dp"
-        app:layout_constraintLeft_toLeftOf="parent" />
+        app:layout_constraintRight_toLeftOf="@+id/bt_end_tournament"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="@+id/bt_end_tournament" />
 
     <Button
         android:text="@string/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/bt_end_tournament"
-        android:layout_marginStart="16dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@+id/bt_pause_tournament" />
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="16dp"
+        android:layout_marginEnd="16dp" />
+
 
 </android.support.constraint.ConstraintLayout>
 </layout>

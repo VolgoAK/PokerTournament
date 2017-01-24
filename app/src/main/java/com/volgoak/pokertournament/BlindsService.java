@@ -116,28 +116,31 @@ public class BlindsService extends Service {
         sGameThread.start();
     }
 
-    private void stopTournament(){
-        sTournamentInProgress = false;
-        sGameThread.interrupt();
-        sRoundNum = 0;
-        stopSelf();
-    }
-
-    private void changeState(){
+    // returns true if state was changed to pause,
+    private boolean changeState(){
         if(sTournamentInProgress){
             sPauseLeftTime = sIncreaseTime - System.currentTimeMillis();
             sTournamentInProgress = false;
             sGameThread.interrupt();
+            return true;
         }else{
             sIncreaseTime = System.currentTimeMillis() + sPauseLeftTime;
             sTournamentInProgress = true;
             //mExecutor.execute(new BlindTimerThread());
             sGameThread = new Thread(new BlindTimerThread());
             sGameThread.start();
+            return false;
         }
     }
 
+    private void stop(){
+        sTournamentInProgress = false;
+        stopSelf();
+    }
 
+    private boolean isPaused(){
+        return !sTournamentInProgress;
+    }
 
     public void showNotification(String notificationType){
         Bundle notBundle = new Bundle();
@@ -154,10 +157,13 @@ public class BlindsService extends Service {
         Notification notification = NotificationUtil.createNotification(this, notBundle);
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
 
+        //Send info to tournament activity if exists
         if(binded){
             String timeMessage = NotificationUtil.parseTime(timeToIncrease);
             Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
             intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
+            intent.putExtra(TournamentActivity.CURRENT_BLIND, sBlindsArray[sRoundNum]);
+            intent.putExtra(TournamentActivity.NEXT_BLIND, sBlindsArray[sRoundNum + 1]);
             sendBroadcast(intent);
         }
     }
@@ -193,9 +199,14 @@ public class BlindsService extends Service {
 
     //Binder class with callback methods
     private class ITimer extends Binder implements BlindTimer{
-       public void changeState(){
-          BlindsService.this.changeState();
+       public boolean changeState(){
+          return BlindsService.this.changeState();
        }
+
+       public void stop(){
+           BlindsService.this.stop();
+       }
+
     }
 }
 

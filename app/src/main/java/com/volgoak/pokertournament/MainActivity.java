@@ -59,8 +59,6 @@ public class MainActivity extends AppCompatActivity{
         int minutesInt = Integer.parseInt(minutesString);
         long roundTime = minutesInt * 60 * 1000;
 
-        Log.d(TAG, "startGame: round time = " + roundTime);
-
         int blindsStructureNum = mBinding.spBlindsStructureMain.getSelectedItemPosition();
         String[] blindsArray = null;
 
