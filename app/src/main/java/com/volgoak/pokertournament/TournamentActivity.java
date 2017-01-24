@@ -85,6 +85,8 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         //set font for clock
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/digits_bold.ttf");
         mBinder.tvTimeToNextTournament.setTypeface(font);
+        mBinder.tvCurrentBlindsTourn.setTypeface(font);
+        mBinder.tvNextBlindsTour.setTypeface(font);
     }
 
     @Override
