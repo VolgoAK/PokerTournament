@@ -77,6 +77,9 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
                     mStopWasClicked = true;
                 }else{
                     mBlindTimer.stop();
+                    Intent intent = new Intent(TournamentActivity.this, MainActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
                     finish();
                 }
             }

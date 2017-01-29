@@ -8,4 +8,14 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="green_button">
+        <item name="android:background">@drawable/green_button</item>
+        <item name="android:layout_width">@dimen/chip_button_size</item>
+        <item name="android:layout_height">@dimen/chip_button_size</item>
+    </style>
+
+    <style name="orange_button" parent="green_button">
+        <item name="background">@drawable/orange_button</item>
+    </style>
+
 </resources>

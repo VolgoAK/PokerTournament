@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity{
 //        String minutesString = mBinding.spRoundTimeMain.getSelectedItem().toString();
         int selectedMinuts = mBinding.wheelRoundTimeMain.getSelectedItemPosition();
         String minutesString = mTimeList.get(selectedMinuts);
-        int minutesInt = Integer.parseInt(minutesString);
-        long roundTime = minutesInt * 60 * 1000;
+        long minutesLong = Long.parseLong(minutesString);
+        long roundTime = minutesLong * 60 * 1000;
 
         int blindsStructureNum = mBinding.wheelBlindsStructureMain.getSelectedItemPosition();
         String[] blindsArray = null;
@@ -108,6 +108,10 @@ public class MainActivity extends AppCompatActivity{
         //Start tournament activity
         Intent activityIntent = new Intent(this, TournamentActivity.class);
         startActivity(activityIntent);
+
+        Log.d(TAG, "startGame: newVersion");
+
+        finish();
     }
 
 }
