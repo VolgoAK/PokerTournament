@@ -15,11 +15,17 @@
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
 
+    <string name="db_created_pref" translatable="false">db_created</string>
+
     <string-array name="blinds_structures">
         <item>Slow</item>
         <item>Medium</item>
         <item>Fast</item>
     </string-array>
+
+    <string name="structure_slow">Slow</string>
+    <string name="structure_mid">Medium</string>
+    <string name="structure_fast">Fast</string>
 
     <string-array name="time_for_round">
         <item>1</item>

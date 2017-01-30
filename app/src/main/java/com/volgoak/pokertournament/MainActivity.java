@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 
+import com.aigestudio.wheelpicker.WheelPicker;
+import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
+import com.volgoak.pokertournament.data.Structure;
 import com.volgoak.pokertournament.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
@@ -27,12 +30,10 @@ public class MainActivity extends AppCompatActivity{
     public static final String TAG = "MainActivity";
 
     private ActivityMainBinding mBinding;
-    // TODO: 23.01.2017 make local
-    private ArrayAdapter<String> mStructureAdapter;
-    private ArrayAdapter<String> mMinutsAdapter;
 
-    private List<String> mStructureList;
+    private List<Structure> mStructureList;
     private List<String> mTimeList;
+    private BlindsDatabaseAdapter mDbAdapter;
 
     // TODO: 23.01.2017 if service is running start tournament activity
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDbAdapter = new BlindsDatabaseAdapter(this);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         //create arrayAdapter for minuteSpinner and link it to spinner
@@ -57,9 +59,7 @@ public class MainActivity extends AppCompatActivity{
         mBinding.wheelRoundTimeMain.setAtmospheric(true);
         mBinding.wheelRoundTimeMain.setItemTextSize(48);
         //same with the structureSpinner
-        String[] structureArray = getResources().getStringArray(R.array.blinds_structures);
-        mStructureList = new ArrayList<>();
-        Collections.addAll(mStructureList, structureArray);
+        mStructureList = mDbAdapter.getStructures();
 
         mBinding.wheelBlindsStructureMain.setData(mStructureList);
         mBinding.wheelBlindsStructureMain.setVisibleItemCount(4);
@@ -84,19 +84,11 @@ public class MainActivity extends AppCompatActivity{
         long minutesLong = Long.parseLong(minutesString);
         long roundTime = minutesLong * 60 * 1000;
 
-        int blindsStructureNum = mBinding.wheelBlindsStructureMain.getSelectedItemPosition();
-        String[] blindsArray = null;
+        int structurePosition = mBinding.wheelBlindsStructureMain.getSelectedItemPosition();
+        Structure selectedStructure = mStructureList.get(structurePosition);
+        List<String> blindsList = mDbAdapter.getBlinds(selectedStructure);
+        String[] blindsArray =  blindsList.toArray(new String[0]);
 
-        switch (blindsStructureNum){
-            case 0 :
-                blindsArray = getResources().getStringArray(R.array.blinds_slow);
-                break;
-            case 1 :
-                blindsArray = getResources().getStringArray(R.array.blinds_mid);
-                break;
-            case 2 :
-                blindsArray = getResources().getStringArray(R.array.blinds_fast);
-        }
         //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
         intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);

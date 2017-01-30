@@ -33,6 +33,8 @@ public class NotificationUtil {
     public static final String EXTRA_BLINDS = "extra_blinds";
 
     public static final int NOTIFICATION_COD = 1237;
+    public static final int SOUND_NOTIFICATION_COD = 1238;
+
 
     //first create simple notification
     public static Notification createNotification(Context context, Bundle extra){
@@ -58,7 +60,7 @@ public class NotificationUtil {
         }else if(ROUND_ENDED.equals(action)){
             title = context.getString(R.string.blinds_increase);
             text = context.getString(R.string.new_blinds) + " " + blinds;
-            builder.setSound(soundUri(context, R.raw.increase_sound));
+            builder.setSound(soundUri(context, R.raw.alarm));
         }
 
         builder.setContentTitle(title);

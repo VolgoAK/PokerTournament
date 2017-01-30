@@ -57,9 +57,9 @@ public class BlindsService extends Service {
         Log.d(TAG, "onStartCommand: action " + taskAction);
         if (!sTournamentInProgress && START_GAME_ACTION.equals(taskAction)) {
             startNewGame(intent);
-            return START_REDELIVER_INTENT;
+            return START_STICKY;
         }
-        return  START_REDELIVER_INTENT;
+        return  START_STICKY;
     }
 
     @Override
