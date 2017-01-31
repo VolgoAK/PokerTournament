@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -93,7 +94,7 @@ public class BlindsService extends Service {
         //test time make changeable
         Log.d(TAG, "startGame: ");
         sRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
-        sIncreaseTime = System.currentTimeMillis() + sRoundTime;
+        sIncreaseTime = SystemClock.elapsedRealtime() + sRoundTime;
         // TODO: 19.01.2017 how to save time in case service was destroyed
         // TODO: 21.01.2017 decide what is sRoundNum number by start sBlinds
 
@@ -108,23 +109,20 @@ public class BlindsService extends Service {
     private void startNextRound(){
         //mExecutor.shutdown();
         sRoundNum++;
-        sTournamentInProgress = true;
         Log.d(TAG, "startNextRound: sRoundNum is " + sRoundNum);
         sBlinds = sBlindsArray[sRoundNum];
-        sIncreaseTime = System.currentTimeMillis() + sRoundTime;
-        sGameThread = new Thread(new BlindTimerThread());
-        sGameThread.start();
+        sIncreaseTime = SystemClock.elapsedRealtime() + sRoundTime;
     }
 
     // returns true if state was changed to pause,
     private boolean changeState(){
         if(sTournamentInProgress){
-            sPauseLeftTime = sIncreaseTime - System.currentTimeMillis();
+            sPauseLeftTime = sIncreaseTime - SystemClock.elapsedRealtime();
             sTournamentInProgress = false;
             sGameThread.interrupt();
             return true;
         }else{
-            sIncreaseTime = System.currentTimeMillis() + sPauseLeftTime;
+            sIncreaseTime = SystemClock.elapsedRealtime() + sPauseLeftTime;
             sTournamentInProgress = true;
             //mExecutor.execute(new BlindTimerThread());
             sGameThread = new Thread(new BlindTimerThread());
@@ -135,6 +133,7 @@ public class BlindsService extends Service {
 
     private void stop(){
         sTournamentInProgress = false;
+        sRoundNum = 0;
         stopSelf();
     }
 
@@ -142,14 +141,21 @@ public class BlindsService extends Service {
         return !sTournamentInProgress;
     }
 
-    public void showNotification(String notificationType){
+    private void notifyTimer(){
+        long timeToIncrease = sIncreaseTime - SystemClock.elapsedRealtime();
+        showNotification();
+        if(timeToIncrease < 0) startNextRound();
+    }
+
+    public void showNotification(){
         Bundle notBundle = new Bundle();
         //add action - show timer
-        String action = NotificationUtil.ROUND_ENDED.equals(notificationType)
+        long timeToIncrease = sIncreaseTime - SystemClock.elapsedRealtime();
+        String action = timeToIncrease < 0
                 ? NotificationUtil.ROUND_ENDED : NotificationUtil.SHOW_TIMER;
         notBundle.putString(NotificationUtil.EXTRA_ACTION, action);
         //add time to increase
-        long timeToIncrease = sIncreaseTime - System.currentTimeMillis();
+
         notBundle.putLong(NotificationUtil.EXTRA_TIME, timeToIncrease);
         //add info about sBlinds
         notBundle.putString(NotificationUtil.EXTRA_BLINDS, sBlinds);
@@ -172,27 +178,13 @@ public class BlindsService extends Service {
         @Override
         public void run() {
             Log.d(TAG, "run: ");
-            long timeToRound = sIncreaseTime - System.currentTimeMillis();
             while (sTournamentInProgress){
-                if(timeToRound > 1000){
                     try{
                         Thread.sleep(1000);
                     }catch (InterruptedException ex){
                         ex.printStackTrace();
                     }
-                    showNotification(NotificationUtil.SHOW_TIMER);
-                    timeToRound = sIncreaseTime - System.currentTimeMillis();
-                }else{
-                    try{
-                        Thread.sleep(timeToRound);
-                    }catch (InterruptedException ex){
-                        ex.printStackTrace();
-                    }
-                    showNotification(NotificationUtil.ROUND_ENDED);
-                    sTournamentInProgress = false;
-                    startNextRound();
-                    break;
-                }
+                    notifyTimer();
             }
         }
     }
