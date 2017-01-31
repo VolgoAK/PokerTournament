@@ -2,10 +2,12 @@ package com.volgoak.pokertournament;
 
 import android.app.Notification;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -25,7 +27,6 @@ public class BlindsService extends Service {
     public static final String EXTRA_ROUND_TIME = "round_time";
     public static final String EXTRA_BLINDS_STRUCTURE = "blinds_structure";
     public static final String EXTRA_START_BLINDS = "start_blinds";
-    public static final String EXTRA_START_TIME = "start_time";
     public static final String EXTRA_BLINDS_ARRAY = "blinds_array";
 
     private static Thread sGameThread;
@@ -37,13 +38,19 @@ public class BlindsService extends Service {
 
     private static int sRoundNum;
 
-    private static int sBlindsResource;
-
     private static long sRoundTime;
     private static long sIncreaseTime;
     private static long sPauseLeftTime;
 
     private static String[] sBlindsArray;
+
+    private PowerManager.WakeLock mWakeLock;
+
+    @Override
+    public void onCreate() {
+        PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
+        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log");
+    }
 
     /**
      * For start timer intent param must have action START_GAME_ACTION and include
@@ -91,7 +98,7 @@ public class BlindsService extends Service {
     }
 
     private void startNewGame(Intent intent){
-        //test time make changeable
+        mWakeLock.acquire();
         Log.d(TAG, "startGame: ");
         sRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
         sIncreaseTime = SystemClock.elapsedRealtime() + sRoundTime;
@@ -120,6 +127,7 @@ public class BlindsService extends Service {
             sPauseLeftTime = sIncreaseTime - SystemClock.elapsedRealtime();
             sTournamentInProgress = false;
             sGameThread.interrupt();
+            mWakeLock.release();
             return true;
         }else{
             sIncreaseTime = SystemClock.elapsedRealtime() + sPauseLeftTime;
@@ -127,6 +135,7 @@ public class BlindsService extends Service {
             //mExecutor.execute(new BlindTimerThread());
             sGameThread = new Thread(new BlindTimerThread());
             sGameThread.start();
+            mWakeLock.acquire();
             return false;
         }
     }
@@ -134,6 +143,7 @@ public class BlindsService extends Service {
     private void stop(){
         sTournamentInProgress = false;
         sRoundNum = 0;
+        mWakeLock.release();
         stopSelf();
     }
 
@@ -147,6 +157,11 @@ public class BlindsService extends Service {
         if(timeToIncrease < 0) startNextRound();
     }
 
+    /**
+     * Creates notification with timer info
+     * Calls startForeground method which doesn't allow Android to
+     * kill service
+     */
     public void showNotification(){
         Bundle notBundle = new Bundle();
         //add action - show timer
