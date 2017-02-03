@@ -55,6 +55,7 @@
 
     <string-array name="blinds_mid">
         <item>5/10</item>
+        <item>10/20</item>
         <item>15/30</item>
         <item>20/40</item>
         <item>30/60</item>

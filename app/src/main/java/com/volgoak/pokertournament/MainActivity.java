@@ -1,5 +1,6 @@
 package com.volgoak.pokertournament;
 
+import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -42,12 +43,18 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //check if TournamentService already started
+        boolean isServiceRunning = isTournamentStarted();
+        if(isServiceRunning){
+            Intent intent = new Intent(this, TournamentActivity.class);
+            startActivity(intent);
+            finish();
+        }
+
         mDbAdapter = new BlindsDatabaseAdapter(this);
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
-        //create arrayAdapter for minuteSpinner and link it to spinner
-        /*mMinutsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
-                 getResources().getStringArray(R.array.time_for_round));*/
+        //get strings with time options and setup wheelPicker with time
         String[] timeArray = getResources().getStringArray(R.array.time_for_round);
         mTimeList = new ArrayList<>();
         Collections.addAll(mTimeList, timeArray);
@@ -58,9 +65,9 @@ public class MainActivity extends AppCompatActivity{
         mBinding.wheelRoundTimeMain.setVisibleItemCount(4);
         mBinding.wheelRoundTimeMain.setAtmospheric(true);
         mBinding.wheelRoundTimeMain.setItemTextSize(48);
-        //same with the structureSpinner
-        mStructureList = mDbAdapter.getStructures();
 
+        //setup structure wheelPicker
+        mStructureList = mDbAdapter.getStructures();
         mBinding.wheelBlindsStructureMain.setData(mStructureList);
         mBinding.wheelBlindsStructureMain.setVisibleItemCount(4);
         mBinding.wheelBlindsStructureMain.setCurved(true);
@@ -78,14 +85,18 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void startGame(){
-//        String minutesString = mBinding.spRoundTimeMain.getSelectedItem().toString();
-        int selectedMinuts = mBinding.wheelRoundTimeMain.getSelectedItemPosition();
+        //get selected round time and parse it to millis
+        int selectedMinuts = mBinding.wheelRoundTimeMain.getCurrentItemPosition();
+        Log.d(TAG, "startGame: selectedPosition " + selectedMinuts);
         String minutesString = mTimeList.get(selectedMinuts);
+        Log.d(TAG, "startGame: minutesString = " + minutesString);
         long minutesLong = Long.parseLong(minutesString);
         long roundTime = minutesLong * 60 * 1000;
 
-        int structurePosition = mBinding.wheelBlindsStructureMain.getSelectedItemPosition();
+        //get selected structure from wheelPicker
+        int structurePosition = mBinding.wheelBlindsStructureMain.getCurrentItemPosition();
         Structure selectedStructure = mStructureList.get(structurePosition);
+        //get blinds of selected structure as a list of strings
         List<String> blindsList = mDbAdapter.getBlinds(selectedStructure);
         String[] blindsArray =  blindsList.toArray(new String[0]);
 
@@ -94,7 +105,6 @@ public class MainActivity extends AppCompatActivity{
         intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);
         intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
         intent.setAction(BlindsService.START_GAME_ACTION);
-
         startService(intent);
 
         //Start tournament activity
@@ -102,8 +112,25 @@ public class MainActivity extends AppCompatActivity{
         startActivity(activityIntent);
 
         Log.d(TAG, "startGame: newVersion");
-
+        //finish activity to avoid returning while tournament in progress
         finish();
+    }
+
+    private boolean isTournamentStarted(){
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        List<ActivityManager.RunningServiceInfo> servicesInfo = activityManager.getRunningServices(Integer.MAX_VALUE);
+
+        String blindsService = BlindsService.class.getName();
+        boolean serviceRunning = false;
+
+        for(int a = 0; a < servicesInfo.size(); a++){
+            Log.d(TAG, servicesInfo.get(a).service.getClassName());
+            if(blindsService.equals(servicesInfo.get(a).service.getClassName())){
+                serviceRunning = true;
+                break;
+            }
+        }
+        return serviceRunning;
     }
 
 }

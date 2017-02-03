@@ -19,7 +19,7 @@ import android.widget.Toast;
 
 import com.volgoak.pokertournament.databinding.ActivityTournamentBinding;
 
-public class TournamentActivity extends AppCompatActivity implements ServiceConnection{
+public class TournamentActivity extends AppCompatActivity implements ServiceConnection {
 
     public static final String TAG = "TournamentActivity";
     //BroadcastReceiver fields
@@ -28,6 +28,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     public static final String CURRENT_BLIND = "current_blind";
     public static final String NEXT_BLIND = "next_blind";
     public static final String CHANGE_STATE_TEXT = "change_state";
+
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
 
@@ -47,7 +48,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         mReceiver = new MyTimeReceiver();
         mIntentFilter = new IntentFilter(RECEIVER_CODE);
 
-        if(savedInstanceState != null){
+        if (savedInstanceState != null) {
             String time = savedInstanceState.getString(TIME_TO_INCREASE);
             mBinder.tvTimeToNextTournament.setText(time);
             String blinds = savedInstanceState.getString(CURRENT_BLIND);
@@ -63,7 +64,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
             @Override
             public void onClick(View v) {
                 boolean isPaused = mBlindTimer.changeState();
-                if(isPaused)((Button) v).setText(getString(R.string.resume));
+                if (isPaused) ((Button) v).setText(getString(R.string.resume));
                 else ((Button) v).setText(R.string.pause);
             }
         });
@@ -72,10 +73,10 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         mBinder.btEndTournament.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!mStopWasClicked){
+                if (!mStopWasClicked) {
                     Toast.makeText(TournamentActivity.this, R.string.tap_one_more, Toast.LENGTH_SHORT).show();
                     mStopWasClicked = true;
-                }else{
+                } else {
                     mBlindTimer.stop();
                     Intent intent = new Intent(TournamentActivity.this, MainActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -95,18 +96,18 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     @Override
     protected void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume: ");
+        //bind to BlindsService
         Intent intent = new Intent(this, BlindsService.class);
         boolean binded = bindService(intent, this, 0);
-        Log.d(TAG, "onResume: binded is " + binded);
 
+        //register receiver for obtain data from service
         mReceiver = new MyTimeReceiver();
         mIntentFilter = new IntentFilter(RECEIVER_CODE);
         registerReceiver(mReceiver, mIntentFilter);
     }
 
     @Override
-    protected void onPause(){
+    protected void onPause() {
         super.onPause();
         unbindService(this);
         unregisterReceiver(mReceiver);
@@ -134,11 +135,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         mBlindTimer = null;
     }
 
-    private void disconnect(){
-        mBlindTimer = null;
-    }
-
-    private class MyTimeReceiver extends BroadcastReceiver{
+    private class MyTimeReceiver extends BroadcastReceiver {
         @Override
         public void onReceive(Context context, Intent intent) {
             String time = intent.getStringExtra(TIME_TO_INCREASE);
