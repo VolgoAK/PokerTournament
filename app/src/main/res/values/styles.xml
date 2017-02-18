@@ -10,12 +10,14 @@
 
     <style name="green_button">
         <item name="android:background">@drawable/green_button</item>
-        <item name="android:layout_width">@dimen/chip_button_size</item>
-        <item name="android:layout_height">@dimen/chip_button_size</item>
+        <item name="android:layout_width">@dimen/start_button_size</item>
+        <item name="android:layout_height">@dimen/start_button_size</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
+        <item name="android:layout_margin">@dimen/buttons_margin</item>
     </style>
 
-    <style name="orange_button" parent="green_button">
-        <item name="background">@drawable/orange_button</item>
+    <style name="start_button" parent="green_button">
+        <item name="android:background">@drawable/orange_button</item>
     </style>
 
 </resources>

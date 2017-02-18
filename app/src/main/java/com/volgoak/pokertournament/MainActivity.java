@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity{
 
     private List<Structure> mStructureList;
     private List<String> mTimeList;
+    private List<String> mBlindsList;
     private BlindsDatabaseAdapter mDbAdapter;
-
-    // TODO: 23.01.2017 if service is running start tournament activity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,7 +50,9 @@ public class MainActivity extends AppCompatActivity{
             finish();
         }
 
+        //initialize sql database adapter
         mDbAdapter = new BlindsDatabaseAdapter(this);
+        //initialize dataBinder
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         //get strings with time options and setup wheelPicker with time
@@ -60,20 +61,22 @@ public class MainActivity extends AppCompatActivity{
         Collections.addAll(mTimeList, timeArray);
 
         mBinding.wheelRoundTimeMain.setData(mTimeList);
-        mBinding.wheelRoundTimeMain.setCurved(true);
-        mBinding.wheelRoundTimeMain.setCyclic(true);
-        mBinding.wheelRoundTimeMain.setVisibleItemCount(4);
-        mBinding.wheelRoundTimeMain.setAtmospheric(true);
-        mBinding.wheelRoundTimeMain.setItemTextSize(48);
+        setupWheel(mBinding.wheelRoundTimeMain);
 
         //setup structure wheelPicker
         mStructureList = mDbAdapter.getStructures();
         mBinding.wheelBlindsStructureMain.setData(mStructureList);
-        mBinding.wheelBlindsStructureMain.setVisibleItemCount(4);
-        mBinding.wheelBlindsStructureMain.setCurved(true);
-        mBinding.wheelBlindsStructureMain.setCyclic(true);
-        mBinding.wheelBlindsStructureMain.setAtmospheric(true);
-        mBinding.wheelBlindsStructureMain.setItemTextSize(48);
+        setupWheel(mBinding.wheelBlindsStructureMain);
+        mBinding.wheelBlindsStructureMain.setOnItemSelectedListener(new WheelPicker.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(WheelPicker picker, Object data, int position) {
+                renewBlindsList();
+            }
+        });
+
+        //setup blinds wheel
+        renewBlindsList();
+        setupWheel(mBinding.wheelStartBlindMain);
 
         //create listener for the start button
         mBinding.btStartMain.setOnClickListener(new View.OnClickListener() {
@@ -97,13 +100,22 @@ public class MainActivity extends AppCompatActivity{
         int structurePosition = mBinding.wheelBlindsStructureMain.getCurrentItemPosition();
         Structure selectedStructure = mStructureList.get(structurePosition);
         //get blinds of selected structure as a list of strings
+        /*
+        we don't need this since we have list mBlinds which contains all blinds of structure
         List<String> blindsList = mDbAdapter.getBlinds(selectedStructure);
-        String[] blindsArray =  blindsList.toArray(new String[0]);
+        String[] blindsArray =  blindsList.toArray(new String[0]);*/
 
+        int startBlindPosition = mBinding.wheelStartBlindMain.getCurrentItemPosition();
+        Log.d(TAG, "startGame: blinds position = " + startBlindPosition);
+        String[] blindsArray = new String[mBlindsList.size() - startBlindPosition];
+        for(int a = startBlindPosition, b = 0; a < mBlindsList.size(); a++, b++){
+            blindsArray[b] = mBlindsList.get(a);
+        }
         //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
         intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);
         intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
+        intent.putExtra(BlindsService.EXTRA_START_BLINDS, startBlindPosition);
         intent.setAction(BlindsService.START_GAME_ACTION);
         startService(intent);
 
@@ -114,6 +126,22 @@ public class MainActivity extends AppCompatActivity{
         Log.d(TAG, "startGame: newVersion");
         //finish activity to avoid returning while tournament in progress
         finish();
+    }
+
+    //prepare wheelPicker
+    private void setupWheel(WheelPicker wheel){
+        wheel.setAtmospheric(true);
+        wheel.setItemTextSize(getResources().getDimensionPixelSize(R.dimen.wheel_text_size));
+        wheel.setCurved(true);
+        wheel.setCyclic(true);
+        wheel.setVisibleItemCount(4);
+    }
+
+    //renew start blind wheel
+    private void renewBlindsList(){
+        Structure structure = mStructureList.get(mBinding.wheelBlindsStructureMain.getCurrentItemPosition());
+        mBlindsList = mDbAdapter.getBlinds(structure);
+        mBinding.wheelStartBlindMain.setData(mBlindsList);
     }
 
     private boolean isTournamentStarted(){
