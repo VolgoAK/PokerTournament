@@ -25,6 +25,7 @@ import java.text.DateFormat;
 
 public class NotificationUtil {
 
+    //Constants for extra
     public static final String TAG = "NotificationUtil";
     public static final String EXTRA_ACTION = "action";
     public static final String EXTRA_TIME = "time";
@@ -32,11 +33,17 @@ public class NotificationUtil {
     public static final String ROUND_ENDED = "round_ended";
     public static final String EXTRA_BLINDS = "extra_blinds";
 
+    //Code of notification for system
     public static final int NOTIFICATION_COD = 1237;
-    public static final int SOUND_NOTIFICATION_COD = 1238;
 
-
-    //first create simple notification
+    /**
+     * Creates notification with params in Bundle
+     * @param context
+     * @param extra Bundle must contain String with a tag EXTRA_BLINDS,
+     *              long time with a tag EXTRA_TIME,
+     *              String action - SHOW_TIMER or ROUND_ENDED with a tag EXTRA_ACTION
+     * @return Notification with info about tournament
+     */
     public static Notification createNotification(Context context, Bundle extra){
 
         Notification.Builder builder = new Notification.Builder(context)
@@ -70,12 +77,23 @@ public class NotificationUtil {
     }
     // TODO: 14.01.2017 add silluete icon for version 21
 
+    /**
+     * Decodes icon bitmap for notification
+     * @param context
+     * @return Bitmap for notification
+     */
     private static Bitmap largeIcon(Context context){
         Resources resources = context.getResources();
         Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.poker_36p);
         return icon;
     }
 
+    /**
+     * Creates Uri of sound for sound notification
+     * @param context
+     * @param sound id of sound
+     * @return Uri of sound
+     */
     private static Uri soundUri(Context context, int sound){
         //Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Uri alarmSound = Uri.parse("android.resource://" + context.getPackageName() + "/" + sound);
@@ -83,12 +101,20 @@ public class NotificationUtil {
         return alarmSound;
     }
 
+    /**
+     * Creates pending intent with TournamentActivity
+     */
     private static PendingIntent pendingIntent(Context context){
         Intent intent = new Intent(context, TournamentActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return pendingIntent;
     }
 
+    /**
+     * Parse time in long to readable String
+     * @param time left time in millis
+     * @return readable time in String
+     */
     public static String parseTime(long time){
         int sec = (int)(time/1000 % 60);
         int min = (int)(time/1000/60);

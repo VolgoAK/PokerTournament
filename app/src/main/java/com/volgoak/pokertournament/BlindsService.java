@@ -15,7 +15,10 @@ import android.util.Log;
 import com.volgoak.pokertournament.utils.NotificationUtil;
 
 /**
- * Created by Volgoak on 14.01.2017.
+ * Service maintains lifecycle of tournament.
+ * It shows notification with time to next round
+ * and current blinds.
+ * Also it runs sound notification when blinds increases
  */
 
 public class BlindsService extends Service {
@@ -24,26 +27,41 @@ public class BlindsService extends Service {
 
     public static final String START_GAME_ACTION = "start_game";
 
+    //Constants for Intent extra
     public static final String EXTRA_ROUND_TIME = "round_time";
-    public static final String EXTRA_BLINDS_STRUCTURE = "blinds_structure";
     public static final String EXTRA_START_BLINDS = "start_blinds";
     public static final String EXTRA_BLINDS_ARRAY = "blinds_array";
 
+    //Thread for countdown clock
     private Thread mGameThread;
 
+    //Timer is ticking while true
     private volatile boolean mTournamentInProgress;
+
+    //Is service bound to an activity
     private boolean mIsBound;
 
-    private String mBlinds;
-
+    //Blinds stored in array of Strings, so we need to know
+    //num of round to pick correct string
     private int mRoundNum;
 
+    //Time for round in millis
     private long mRoundTime;
+
+    //Time to increase blinds
     private long mIncreaseTime;
+
+    //When game paused service save time
     private long mPauseLeftTime;
 
+    //All blinds are stored here
     private String[] mBlindsArray;
 
+    //Current blinds
+    private String mBlinds;
+
+    //Service use WakeLock for don't allow system
+    //to sleep
     private PowerManager.WakeLock mWakeLock;
 
     @Override
@@ -75,6 +93,9 @@ public class BlindsService extends Service {
         mTournamentInProgress = false;
     }
 
+    /**
+    * Returns binder when Activity call BindService()
+     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -97,19 +118,27 @@ public class BlindsService extends Service {
     }
 
     private void startNewGame(Intent intent){
+        //doesn't allow system go to sleep mode
         mWakeLock.acquire();
         Log.d(TAG, "startGame: ");
+
+        //get round time and calculate time when increase blinds
         mRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
         mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime;
 
+        //get array of blinds and set start blind
         mBlindsArray = intent.getStringArrayExtra(EXTRA_BLINDS_ARRAY);
         mBlinds = mBlindsArray[0];
 
+        //start game thread
         mTournamentInProgress = true;
         mGameThread = new Thread(new BlindTimerThread());
         mGameThread.start();
     }
 
+    /**
+     * Increases blinds and renew time
+     */
     private void startNextRound(){
         mRoundNum++;
         Log.d(TAG, "startNextRound: mRoundNum is " + mRoundNum);
@@ -117,7 +146,10 @@ public class BlindsService extends Service {
         mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime;
     }
 
-    // returns true if state was changed to pause,
+    /**
+     * Change state to pause and to active
+     * @return true if state changed to pause, false if to active
+    */
     private boolean changeState(){
         if(mTournamentInProgress){
             mPauseLeftTime = mIncreaseTime - SystemClock.elapsedRealtime();
@@ -136,6 +168,9 @@ public class BlindsService extends Service {
         }
     }
 
+    /**
+     * destroy service
+     */
     private void stop(){
         mTournamentInProgress = false;
         mRoundNum = 0;
@@ -176,7 +211,7 @@ public class BlindsService extends Service {
         Notification notification = NotificationUtil.createNotification(this, notBundle);
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
 
-        //Send info to tournament activity if exists
+        //Send info to tournament activity if service is bound
         if(mIsBound){
             String timeMessage = NotificationUtil.parseTime(timeToIncrease);
             Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
@@ -187,6 +222,10 @@ public class BlindsService extends Service {
         }
     }
 
+    /**
+     * Simple runnable class which call notifyTimer()
+     * every one second
+     */
     private class BlindTimerThread implements Runnable{
         @Override
         public void run() {

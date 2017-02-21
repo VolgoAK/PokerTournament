@@ -1,7 +1,8 @@
 package com.volgoak.pokertournament;
 
 /**
- * Created by Volgoak on 21.01.2017.
+ * Interface for bind Tournament activity
+ * to BlindService
  */
 
  interface BlindTimer {

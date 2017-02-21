@@ -19,7 +19,7 @@ import java.util.List;
 
 public class BlindsDatabaseAdapter {
 
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 3;
     public static final String DB_NAME = "blinds_db";
 
     public static final String TABLE_STRUCTURES = "structures_table";
@@ -89,6 +89,9 @@ public class BlindsDatabaseAdapter {
         return blinds;
     }
 
+    /**
+     * Add default structures if database is empty
+     */
     private void addStructures(){
         long slowID = addStructure(mContext.getString(R.string.structure_slow));
         String[] slowBlinds = mContext.getResources().getStringArray(R.array.blinds_slow);
@@ -137,7 +140,9 @@ public class BlindsDatabaseAdapter {
 
         @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BLINDS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_STRUCTURES);
+            onCreate(db);
         }
     }
 }

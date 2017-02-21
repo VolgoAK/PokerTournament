@@ -13,6 +13,8 @@
     <string name="stop">Stop</string>
     <string name="tap_one_more">Tap one more time to stop</string>
 
+    <string name="change_structures">Change structures</string>
+
     <string name="pause">Pause</string>
     <string name="resume">Resume</string>
 
@@ -52,6 +54,31 @@
         <item>80/160</item>
         <item>100/200</item>
         <item>120/250</item>
+        <item>150/300</item>
+        <item>170/350</item>
+        <item>200/400</item>
+        <item>250/500</item>
+        <item>300/600</item>
+        <item>350/700</item>
+        <item>400/800</item>
+        <item>500/1000</item>
+        <item>600/1200</item>
+        <item>700/1500</item>
+        <item>800/1700</item>
+        <item>1000/2000</item>
+        <item>1200/2400</item>
+        <item>1500/3000</item>
+        <item>1700/3500</item>
+        <item>2000/4000</item>
+        <item>2500/5000</item>
+        <item>3000/6000</item>
+        <item>3500/7000</item>
+        <item>4000/8000</item>
+        <item>5000/10000</item>
+        <item>6000/12000</item>
+        <item>7000/15000</item>
+        <item>8000/17000</item>
+        <item>10000/20000</item>
     </string-array>
 
     <string-array name="blinds_mid">
@@ -69,6 +96,26 @@
         <item>150/300</item>
         <item>200/400</item>
         <item>300/600</item>
+        <item>400/800</item>
+        <item>500/1000</item>
+        <item>600/1200</item>
+        <item>800/1500</item>
+        <item>1000/2000</item>
+        <item>1300/2500</item>
+        <item>1500/3000</item>
+        <item>2000/4000</item>
+        <item>2500/5000</item>
+        <item>3500/7000</item>
+        <item>4000/8000</item>
+        <item>5000/10000</item>
+        <item>6000/12000</item>
+        <item>7000/14000</item>
+        <item>9000/18000</item>
+        <item>11000/22000</item>
+        <item>14000/28000</item>
+        <item>17000/35000</item>
+        <item>21000/42000</item>
+        <item>25000/50000</item>
     </string-array>
 
     <string-array name="blinds_fast">
@@ -85,6 +132,14 @@
         <item>500/1000</item>
         <item>750/1500</item>
         <item>1000/2000</item>
+        <item>1500/3000</item>
+        <item>2500/5000</item>
+        <item>4000/8000</item>
+        <item>6000/12000</item>
+        <item>10000/20000</item>
+        <item>15000/30000</item>
+        <item>25000/50000</item>
+        <item>40000/80000</item>
     </string-array>
 
 </resources>

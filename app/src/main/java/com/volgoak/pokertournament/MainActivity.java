@@ -5,14 +5,18 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -42,8 +46,15 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //check if TournamentService already started
+        //!!!!!!!!!!
+        //delete after recreating db
+//        String prefTitle = getString(R.string.db_created_pref);
+//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+//        preferences.edit().putBoolean(prefTitle, false).apply();
+
+        //check if BlindsService already started
         boolean isServiceRunning = isTournamentStarted();
+        //if a BlindsService started launch TournamentActivity
         if(isServiceRunning){
             Intent intent = new Intent(this, TournamentActivity.class);
             startActivity(intent);
@@ -144,6 +155,11 @@ public class MainActivity extends AppCompatActivity{
         mBinding.wheelStartBlindMain.setData(mBlindsList);
     }
 
+    /**
+     * Get all system services and check if BlindsService
+     * already ran
+     * @return true if BlindsService ran
+     */
     private boolean isTournamentStarted(){
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         List<ActivityManager.RunningServiceInfo> servicesInfo = activityManager.getRunningServices(Integer.MAX_VALUE);
@@ -161,4 +177,10 @@ public class MainActivity extends AppCompatActivity{
         return serviceRunning;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+        return true;
+    }
 }
