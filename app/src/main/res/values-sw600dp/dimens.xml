@@ -3,5 +3,9 @@
     <dimen name="chip_button_size">130dp</dimen>
     <dimen name="views_horizontal_margin">24dp</dimen>
     <dimen name="views_vertical_margin">24dp</dimen>
+    <dimen name="current_blinds_text_size">34sp</dimen>
+    <dimen name="title_fields_text_size">24sp</dimen>
+    <dimen name="next_blinds_text_size">56sp</dimen>
     <dimen name="start_button_size">120dp</dimen>
+    <dimen name="timer_text_size">112sp</dimen>
 </resources>

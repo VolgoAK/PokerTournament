@@ -78,6 +78,7 @@ public class BlindsService extends Service {
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        // TODO: 21.03.2017 fix error with nullpointexception on intent
         String taskAction = intent.getAction();
         Log.d(TAG, "onStartCommand: action " + taskAction);
         if (!mTournamentInProgress && START_GAME_ACTION.equals(taskAction)) {
@@ -140,6 +141,7 @@ public class BlindsService extends Service {
      * Increases blinds and renew time
      */
     private void startNextRound(){
+        // TODO: 21.03.2017 fix error when no more blinds in an array
         mRoundNum++;
         Log.d(TAG, "startNextRound: mRoundNum is " + mRoundNum);
         mBlinds = mBlindsArray[mRoundNum];

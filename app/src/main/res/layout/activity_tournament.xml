@@ -13,14 +13,14 @@
     <TextView
         android:text="00:00"
         android:id="@+id/tv_time_to_next_tournament"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display4"
+        android:textSize="@dimen/timer_text_size"
         android:textColor="@color/colorOrange"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/tv_current_blinds_tourn"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="@dimen/views_vertical_margin" />
 
     <TextView
         android:text="@string/blinds_is"
@@ -32,7 +32,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/tv_current_blinds_tourn"
         app:layout_constraintHorizontal_bias="0.67"
-        android:layout_marginStart="16dp" />
+        android:layout_marginStart="@dimen/views_horizontal_margin" />
 
     <TextView
         android:text="0/0"
@@ -41,14 +41,14 @@
         android:layout_height="wrap_content"
         android:id="@+id/tv_current_blinds_tourn"
         android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display3"
-        app:layout_constraintRight_toRightOf="parent"
-        android:layout_marginTop="16dp"
+        android:textSize="@dimen/current_blinds_text_size"
+        android:layout_marginTop="@dimen/views_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_marginBottom="@dimen/views_vertical_margin"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginEnd="16dp"
-        android:layout_marginStart="16dp"
+        app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginBottom="16dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <TextView
@@ -58,7 +58,6 @@
         android:id="@+id/tv_next_blinds_title_tournament"
         app:layout_constraintRight_toRightOf="@+id/tv_blinds_title_tournament"
         app:layout_constraintLeft_toLeftOf="@+id/tv_blinds_title_tournament"
-        android:layout_marginTop="8dp"
         app:layout_constraintTop_toTopOf="@+id/tv_next_blinds_tour"
         app:layout_constraintBottom_toBottomOf="@+id/tv_next_blinds_tour"/>
 
@@ -69,11 +68,11 @@
         android:id="@+id/tv_next_blinds_tour"
         android:textColor="@android:color/black"
         android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+        android:textSize="@dimen/next_blinds_text_size"
         app:layout_constraintTop_toBottomOf="@+id/tv_current_blinds_tourn"
         app:layout_constraintRight_toRightOf="@+id/tv_current_blinds_tourn"
         app:layout_constraintLeft_toLeftOf="@+id/tv_current_blinds_tourn"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="@dimen/views_vertical_margin" />
 
     <Button
         android:text="@string/pause"
@@ -81,23 +80,21 @@
         android:layout_height="wrap_content"
         android:id="@+id/bt_pause_tournament"
         style="@style/green_button"
-        android:textColor="@color/colorOrange"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp" />
+        android:layout_marginBottom="@dimen/views_vertical_margin" />
 
     <Button
         android:text="@string/stop"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/green_button"
-        android:textColor="@color/colorOrange"
         android:id="@+id/bt_end_tournament"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="16dp"
-        android:layout_marginEnd="16dp" />
+        android:layout_marginBottom="@dimen/views_vertical_margin"
+        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
 
 </android.support.constraint.ConstraintLayout>

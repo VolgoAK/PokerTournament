@@ -7,5 +7,9 @@
     <dimen name="start_button_size">80dp</dimen>
     <dimen name="views_horizontal_margin">16dp</dimen>
     <dimen name="views_vertical_margin">16dp</dimen>
-    <dimen name="wheel_text_size">48sp</dimen>
+    <dimen name="current_blinds_text_size">20sp</dimen>
+    <dimen name="next_blinds_text_size">28sp</dimen>
+    <dimen name="title_fields_text_size">18sp</dimen>
+    <dimen name="wheel_text_size">28sp</dimen>
+    <dimen name="timer_text_size">28sp</dimen>
 </resources>

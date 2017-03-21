@@ -13,14 +13,14 @@
             android:text="@string/blinds_structure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="@dimen/title_fields_text_size"
             android:id="@+id/tv_blind_structure_main"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="@+id/wheel_blinds_structure_main"
-            app:layout_constraintRight_toRightOf="@id/wheel_blinds_structure_main"
+            app:layout_constraintRight_toRightOf="@+id/wheel_blinds_structure_main"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="48dp"
-            app:layout_constraintVertical_bias="0.24000001" />
+            app:layout_constraintVertical_bias="0.060000002" />
 
         <com.aigestudio.wheelpicker.WheelPicker
             android:id="@+id/wheel_blinds_structure_main"
@@ -36,8 +36,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_round_time_main"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
-            app:layout_constraintTop_toTopOf="@id/tv_blind_structure_main"
+            android:textSize="@dimen/title_fields_text_size"
+            app:layout_constraintTop_toTopOf="@+id/tv_blind_structure_main"
             app:layout_constraintLeft_toLeftOf="@+id/wheel_round_time_main"
             app:layout_constraintRight_toRightOf="@+id/wheel_round_time_main" />
 
@@ -46,8 +46,8 @@
             android:id="@+id/wheel_round_time_main"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="@id/wheel_blinds_structure_main"
-            app:layout_constraintLeft_toRightOf="@id/wheel_blinds_structure_main"
+            app:layout_constraintTop_toTopOf="@+id/wheel_blinds_structure_main"
+            app:layout_constraintLeft_toRightOf="@+id/wheel_blinds_structure_main"
             app:layout_constraintRight_toRightOf="parent"/>
 
         <TextView
@@ -56,7 +56,7 @@
             android:id="@+id/tv_start_blinds_main"
             android:text="@string/start_blind"
             android:layout_marginTop="8dp"
-            android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+            android:textSize="@dimen/title_fields_text_size"
             app:layout_constraintLeft_toLeftOf="@+id/wheel_start_blind_main"
             app:layout_constraintRight_toRightOf="@+id/wheel_start_blind_main"
             app:layout_constraintTop_toBottomOf="@+id/wheel_blinds_structure_main" />
@@ -80,7 +80,7 @@
             android:id="@+id/bt_start_main"
             android:layout_marginTop="8dp"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+            app:layout_constraintBottom_toBottomOf="parent" />
 
 
 

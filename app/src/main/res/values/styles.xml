@@ -14,10 +14,12 @@
         <item name="android:layout_height">@dimen/start_button_size</item>
         <item name="android:textAppearance">@style/TextAppearance.AppCompat.Large</item>
         <item name="android:layout_margin">@dimen/buttons_margin</item>
+        <item name="android:textColor">@color/colorOrange</item>
     </style>
 
     <style name="start_button" parent="green_button">
         <item name="android:background">@drawable/orange_button</item>
+        <item name="android:textColor">@color/colorVeryDarkGreen</item>
     </style>
 
 </resources>

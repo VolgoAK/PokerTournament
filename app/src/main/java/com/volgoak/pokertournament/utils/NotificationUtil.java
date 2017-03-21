@@ -1,22 +1,18 @@
 package com.volgoak.pokertournament.utils;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.volgoak.pokertournament.R;
 import com.volgoak.pokertournament.TournamentActivity;
-
-import java.text.DateFormat;
 
 
 /**
@@ -67,7 +63,8 @@ public class NotificationUtil {
         }else if(ROUND_ENDED.equals(action)){
             title = context.getString(R.string.blinds_increase);
             text = context.getString(R.string.new_blinds) + " " + blinds;
-            builder.setSound(soundUri(context, R.raw.alarm));
+            // TODO: 18.03.2017 add sound
+            //builder.setSound(soundUri(context, R.raw.alarm));
         }
 
         builder.setContentTitle(title);
