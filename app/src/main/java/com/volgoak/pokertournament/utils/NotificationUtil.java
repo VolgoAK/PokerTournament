@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -64,7 +65,7 @@ public class NotificationUtil {
             title = context.getString(R.string.blinds_increase);
             text = context.getString(R.string.new_blinds) + " " + blinds;
             // TODO: 18.03.2017 add sound
-            //builder.setSound(soundUri(context, R.raw.alarm));
+            builder.setSound(soundUri(context, -1));
         }
 
         builder.setContentTitle(title);
@@ -92,8 +93,11 @@ public class NotificationUtil {
      * @return Uri of sound
      */
     private static Uri soundUri(Context context, int sound){
-        //Uri alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        Uri alarmSound = Uri.parse("android.resource://" + context.getPackageName() + "/" + sound);
+        Uri alarmSound = null;
+        if(sound == -1) {
+            alarmSound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        }
+        //Uri alarmSound = Uri.parse("android.resource://" + context.getPackageName() + "/" + sound);
         Log.d(TAG, "soundUri: " + alarmSound);
         return alarmSound;
     }

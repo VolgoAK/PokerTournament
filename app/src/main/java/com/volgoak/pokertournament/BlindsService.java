@@ -147,7 +147,23 @@ public class BlindsService extends Service {
         mRoundNum++;
         Log.d(TAG, "startNextRound: mRoundNum is " + mRoundNum);
         mBlinds = mBlindsList.get(mRoundNum);
+
+        if(mRoundNum == mBlindsList.size() - 1) produceBlinds();
+
         mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime;
+    }
+
+    /**
+     * Creates new blinds when current is last in a list.
+     * It produses kind of useless blinds and need only
+     * for avoid IndexOfBoundException
+     */
+    private void produceBlinds(){
+        String[] blinds = mBlindsList.get(mBlindsList.size() - 1).split("/");
+        int smallBlind = Integer.parseInt(blinds[0]) * 2;
+        int bigBlind = smallBlind * 2;
+        String newBlinds = smallBlind + "/" + bigBlind;
+        mBlindsList.add(newBlinds);
     }
 
     /**
