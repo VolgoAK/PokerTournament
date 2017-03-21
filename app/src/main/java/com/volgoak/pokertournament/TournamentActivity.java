@@ -8,9 +8,9 @@ import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -72,16 +72,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         mBinder.btEndTournament.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!mStopWasClicked) {
-                    Toast.makeText(TournamentActivity.this, R.string.tap_one_more, Toast.LENGTH_SHORT).show();
-                    mStopWasClicked = true;
-                } else {
-                    mBlindTimer.stop();
-                    Intent intent = new Intent(TournamentActivity.this, MainActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(intent);
-                    finish();
-                }
+                tryToStopService();
             }
         });
 
@@ -132,6 +123,33 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     public void onServiceDisconnected(ComponentName name) {
         Log.d(TAG, "onServiceDisconnected: ");
         mBlindTimer = null;
+    }
+
+    //call when stop button clicked. If clicked second time in five seconds it stops service
+    //else run timer
+    private void tryToStopService(){
+        if (!mStopWasClicked) {
+            Toast.makeText(TournamentActivity.this, R.string.tap_one_more, Toast.LENGTH_SHORT).show();
+            mStopWasClicked = true;
+            Thread thread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try{
+                        Thread.sleep(5000);
+                    }catch(InterruptedException ex){
+                        ex.printStackTrace();
+                    }
+                    mStopWasClicked = false;
+                }
+            });
+            thread.start();
+        } else {
+            mBlindTimer.stop();
+            Intent intent = new Intent(TournamentActivity.this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
+            finish();
+        }
     }
 
     private class MyTimeReceiver extends BroadcastReceiver {
