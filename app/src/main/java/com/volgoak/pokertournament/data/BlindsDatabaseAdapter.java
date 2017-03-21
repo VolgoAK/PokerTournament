@@ -76,11 +76,11 @@ public class BlindsDatabaseAdapter {
         return structures;
     }
 
-    public List<String> getBlinds(Structure structure){
+    public ArrayList<String> getBlinds(Structure structure){
         Cursor cursor = mDB.rawQuery("SELECT * FROM " + TABLE_BLINDS
             + " WHERE " + COLUMN_STRUCTURE_ID  + "=" + structure.id, null);
 
-        List<String> blinds = new ArrayList<>();
+        ArrayList<String> blinds = new ArrayList<>();
 
         while(cursor.moveToNext()){
             blinds.add(cursor.getString(cursor.getColumnIndex(COLUMN_BLINDS)));

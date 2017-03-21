@@ -14,6 +14,8 @@ import android.util.Log;
 
 import com.volgoak.pokertournament.utils.NotificationUtil;
 
+import java.util.ArrayList;
+
 /**
  * Service maintains lifecycle of tournament.
  * It shows notification with time to next round
@@ -29,8 +31,9 @@ public class BlindsService extends Service {
 
     //Constants for Intent extra
     public static final String EXTRA_ROUND_TIME = "round_time";
-    public static final String EXTRA_START_BLINDS = "start_blinds";
+    //public static final String EXTRA_START_BLINDS = "start_blinds";
     public static final String EXTRA_BLINDS_ARRAY = "blinds_array";
+    public static final String EXTRA_START_ROUND = "start_round";
 
     //Thread for countdown clock
     private Thread mGameThread;
@@ -55,7 +58,7 @@ public class BlindsService extends Service {
     private long mPauseLeftTime;
 
     //All blinds are stored here
-    private String[] mBlindsArray;
+    private ArrayList<String> mBlindsList;
 
     //Current blinds
     private String mBlinds;
@@ -123,11 +126,10 @@ public class BlindsService extends Service {
         mWakeLock.acquire();
         Log.d(TAG, "startGame: ");
 
-        //get round time
+        //data from intent
         mRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
-
-        //get array of blinds
-        mBlindsArray = intent.getStringArrayExtra(EXTRA_BLINDS_ARRAY);
+        mBlindsList = intent.getStringArrayListExtra(EXTRA_BLINDS_ARRAY);
+        mRoundNum = intent.getIntExtra(EXTRA_START_ROUND, -1);
 
         //set increase time and blinds
         startNextRound();
@@ -144,7 +146,7 @@ public class BlindsService extends Service {
         // TODO: 21.03.2017 fix error when no more blinds in an array
         mRoundNum++;
         Log.d(TAG, "startNextRound: mRoundNum is " + mRoundNum);
-        mBlinds = mBlindsArray[mRoundNum];
+        mBlinds = mBlindsList.get(mRoundNum);
         mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime;
     }
 
@@ -218,8 +220,8 @@ public class BlindsService extends Service {
             String timeMessage = NotificationUtil.parseTime(timeToIncrease);
             Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
             intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
-            intent.putExtra(TournamentActivity.CURRENT_BLIND, mBlindsArray[mRoundNum]);
-            intent.putExtra(TournamentActivity.NEXT_BLIND, mBlindsArray[mRoundNum + 1]);
+            intent.putExtra(TournamentActivity.CURRENT_BLIND, mBlinds);
+            intent.putExtra(TournamentActivity.NEXT_BLIND, mBlindsList.get(mRoundNum + 1));
             sendBroadcast(intent);
         }
     }

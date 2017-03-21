@@ -1,25 +1,14 @@
 package com.volgoak.pokertournament;
 
 import android.app.ActivityManager;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.IBinder;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
 
 import com.aigestudio.wheelpicker.WheelPicker;
 import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
@@ -38,7 +27,7 @@ public class MainActivity extends AppCompatActivity{
 
     private List<Structure> mStructureList;
     private List<String> mTimeList;
-    private List<String> mBlindsList;
+    private ArrayList<String> mBlindsList;
     private BlindsDatabaseAdapter mDbAdapter;
 
     @Override
@@ -107,26 +96,13 @@ public class MainActivity extends AppCompatActivity{
         long minutesLong = Long.parseLong(minutesString);
         long roundTime = minutesLong * 60 * 1000;
 
-        //get selected structure from wheelPicker
-        int structurePosition = mBinding.wheelBlindsStructureMain.getCurrentItemPosition();
-        Structure selectedStructure = mStructureList.get(structurePosition);
-        //get blinds of selected structure as a list of strings
-        /*
-        we don't need this since we have list mBlinds which contains all blinds of structure
-        List<String> blindsList = mDbAdapter.getBlinds(selectedStructure);
-        String[] blindsArray =  blindsList.toArray(new String[0]);*/
-
         int startBlindPosition = mBinding.wheelStartBlindMain.getCurrentItemPosition();
-        Log.d(TAG, "startGame: blinds position = " + startBlindPosition);
-        String[] blindsArray = new String[mBlindsList.size() - startBlindPosition];
-        for(int a = startBlindPosition, b = 0; a < mBlindsList.size(); a++, b++){
-            blindsArray[b] = mBlindsList.get(a);
-        }
+
         //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
-        intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, blindsArray);
+        intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, mBlindsList);
         intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
-        intent.putExtra(BlindsService.EXTRA_START_BLINDS, startBlindPosition);
+        intent.putExtra(BlindsService.EXTRA_START_ROUND, --startBlindPosition);
         intent.setAction(BlindsService.START_GAME_ACTION);
         startService(intent);
 
