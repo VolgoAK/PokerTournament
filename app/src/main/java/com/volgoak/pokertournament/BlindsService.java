@@ -123,14 +123,14 @@ public class BlindsService extends Service {
         mWakeLock.acquire();
         Log.d(TAG, "startGame: ");
 
-        //get round time and calculate time when increase blinds
+        //get round time
         mRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
-        mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime;
 
-        //get array of blinds and set start blind
+        //get array of blinds
         mBlindsArray = intent.getStringArrayExtra(EXTRA_BLINDS_ARRAY);
-        mBlinds = mBlindsArray[0];
 
+        //set increase time and blinds
+        startNextRound();
         //start game thread
         mTournamentInProgress = true;
         mGameThread = new Thread(new BlindTimerThread());

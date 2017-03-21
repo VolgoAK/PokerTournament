@@ -2,6 +2,6 @@
 <resources>
     <dimen name="title_fields_text_size">18sp</dimen>
     <dimen name="next_blinds_text_size">22sp</dimen>
-    <dimen name="current_blinds_text_size">36sp</dimen>
+    <dimen name="current_blinds_text_size">30sp</dimen>
     <dimen name="timer_text_size">72sp</dimen>
 </resources>
