@@ -16,6 +16,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
 import com.volgoak.pokertournament.databinding.ActivityTournamentBinding;
 
 public class TournamentActivity extends AppCompatActivity implements ServiceConnection {
@@ -36,6 +39,8 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     private BlindTimer mBlindTimer;
 
     private boolean mStopWasClicked;
+
+    private AdView mAdView;
 
 
     @Override
@@ -81,6 +86,13 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         mBinder.tvTimeToNextTournament.setTypeface(font);
         mBinder.tvCurrentBlindsTourn.setTypeface(font);
         mBinder.tvNextBlindsTour.setTypeface(font);
+
+        // TODO: 07.06.2017 replace with my ads id before publish
+        MobileAds.initialize(this, "ca-app-pub-3940256099942544/6300978111");
+        AdRequest request = new  AdRequest.Builder().build();
+        mAdView = (AdView) findViewById(R.id.adView);
+        mAdView.loadAd(request);
+
     }
 
     @Override

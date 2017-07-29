@@ -2,11 +2,10 @@ package com.volgoak.pokertournament.data;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.preference.PreferenceManager;
+import android.util.Log;
 
 import com.volgoak.pokertournament.R;
 
@@ -19,7 +18,9 @@ import java.util.List;
 
 public class BlindsDatabaseAdapter {
 
-    public static final int DB_VERSION = 3;
+    public static final String TAG = BlindsDatabaseAdapter.class.getSimpleName();
+
+    public static final int DB_VERSION = 5;
     public static final String DB_NAME = "blinds_db";
 
     public static final String TABLE_STRUCTURES = "structures_table";
@@ -30,10 +31,12 @@ public class BlindsDatabaseAdapter {
     public static final String COLUMN_STRUCTURE_ID = "structure_id";
     public static final String COLUMN_ROUND = "round";
     public static final String COLUMN_BLINDS = "blinds";
+    public static final String COLUMN_MULT_PERCENTS = "mult_column";
 
     public static final String CREATE_TABLE_STRUCTURES = "CREATE TABLE " + TABLE_STRUCTURES + "("
             + COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
             + COLUMN_STRUCTURE + " TEXT, "
+            + COLUMN_MULT_PERCENTS + " INTEGER,"
             + "UNIQUE (" + COLUMN_STRUCTURE + ")"
             + ");";
 
@@ -53,12 +56,22 @@ public class BlindsDatabaseAdapter {
         mDB = new BlindsDbOpenHelper(context).getWritableDatabase();
 
         //insert default structures only at first launch
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        /*SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean isBaseCreated = preferences.getBoolean(context.getString(R.string.db_created_pref), false);
         if(!isBaseCreated){
             addStructures();
             preferences.edit().putBoolean(context.getString(R.string.db_created_pref), true).apply();
+        }*/
+        if(isDbEmpty()){
+            addStructures();
         }
+    }
+
+    public boolean isDbEmpty(){
+        Cursor cursor = mDB.rawQuery("SELECT * FROM " + TABLE_STRUCTURES + " LIMIT 1", null);
+        boolean isEmpty = !cursor.moveToFirst();
+        cursor.close();
+        return isEmpty;
     }
 
     public List<Structure> getStructures(){
@@ -93,28 +106,30 @@ public class BlindsDatabaseAdapter {
      * Add default structures if database is empty
      */
     private void addStructures(){
-        long slowID = addStructure(mContext.getString(R.string.structure_slow));
+        long slowID = addStructure(mContext.getString(R.string.structure_slow), 15);
         String[] slowBlinds = mContext.getResources().getStringArray(R.array.blinds_slow);
         for(int a = 0; a < slowBlinds.length; a++){
             addBlinds(slowID, a, slowBlinds[a]);
         }
 
-        long midId = addStructure(mContext.getString(R.string.structure_mid));
+        long midId = addStructure(mContext.getString(R.string.structure_mid), 20);
         String[] midBlinds = mContext.getResources().getStringArray(R.array.blinds_mid);
         for(int a = 0; a < midBlinds.length; a++){
             addBlinds(midId, a, midBlinds[a]);
         }
 
-        long fastId = addStructure(mContext.getString(R.string.structure_fast));
+        long fastId = addStructure(mContext.getString(R.string.structure_fast), 50);
         String[] fastblinds = mContext.getResources().getStringArray(R.array.blinds_fast);
         for(int a = 0; a < fastblinds.length; a++){
             addBlinds(fastId, a, fastblinds[a]);
         }
     }
 
-    private long addStructure(String structureName){
+    private long addStructure(String structureName, int mult){
+        Log.d(TAG, "addStructure: " + structureName);
         ContentValues values = new ContentValues();
         values.put(COLUMN_STRUCTURE, structureName);
+        values.put(COLUMN_MULT_PERCENTS, mult);
         return mDB.insert(TABLE_STRUCTURES, null, values);
     }
 
@@ -134,6 +149,7 @@ public class BlindsDatabaseAdapter {
 
         @Override
         public void onCreate(SQLiteDatabase db) {
+            Log.d(TAG, "onCreate: creating database");
             db.execSQL(CREATE_TABLE_STRUCTURES);
             db.execSQL(CREATE_TABLE_BLINDS);
         }

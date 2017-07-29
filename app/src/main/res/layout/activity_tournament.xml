@@ -82,7 +82,7 @@
         style="@style/green_button"
         android:layout_marginStart="@dimen/activity_horizontal_margin"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+       app:layout_constraintBottom_toTopOf="@+id/adView"
         android:layout_marginBottom="@dimen/views_vertical_margin" />
 
     <Button
@@ -92,10 +92,21 @@
         style="@style/green_button"
         android:id="@+id/bt_end_tournament"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/adView"
         android:layout_marginBottom="@dimen/views_vertical_margin"
         android:layout_marginEnd="@dimen/activity_horizontal_margin" />
 
+    <com.google.android.gms.ads.AdView
+        xmlns:ads="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/adView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        ads:layout_constraintBottom_toBottomOf="parent"
+        ads:layout_constraintLeft_toLeftOf="parent"
+        ads:layout_constraintRight_toRightOf="parent"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
 
 </android.support.constraint.ConstraintLayout>
 </layout>

@@ -63,7 +63,7 @@ public class BlindsService extends Service {
     //Current blinds
     private String mBlinds;
 
-    //Service use WakeLock for don't allow system
+    //Service uses a WakeLock for don't allow system
     //to sleep
     private PowerManager.WakeLock mWakeLock;
 
