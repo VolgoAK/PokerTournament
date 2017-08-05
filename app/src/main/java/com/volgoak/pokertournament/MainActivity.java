@@ -22,6 +22,9 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity{
 
     public static final String TAG = "MainActivity";
+    public static final String SAVED_TIME_POSITION = "saved_time";
+    public static final String SAVED_BLIND_POSITION = "saved_blind";
+    public static final String SAVED_STRUCTURE_POSITION = "saved_structure";
 
     private ActivityMainBinding mBinding;
 
@@ -85,6 +88,28 @@ public class MainActivity extends AppCompatActivity{
                 startGame();
             }
         });
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        int structurePosition = savedInstanceState.getInt(SAVED_STRUCTURE_POSITION, 0);
+        mBinding.wheelBlindsStructureMain.setSelectedItemPosition(structurePosition);
+
+        int blindPosition = savedInstanceState.getInt(SAVED_BLIND_POSITION, 0);
+        mBinding.wheelStartBlindMain.setSelectedItemPosition(blindPosition);
+
+        int timePosition = savedInstanceState.getInt(SAVED_TIME_POSITION, 0);
+        mBinding.wheelRoundTimeMain.setSelectedItemPosition(timePosition);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(SAVED_STRUCTURE_POSITION, mBinding.wheelBlindsStructureMain.getCurrentItemPosition());
+        outState.putInt(SAVED_BLIND_POSITION, mBinding.wheelStartBlindMain.getCurrentItemPosition());
+        outState.putInt(SAVED_TIME_POSITION, mBinding.wheelRoundTimeMain.getCurrentItemPosition());
     }
 
     private void startGame(){
@@ -159,4 +184,6 @@ public class MainActivity extends AppCompatActivity{
         inflater.inflate(R.menu.main_menu, menu);
         return true;
     }
+
+
 }

@@ -241,8 +241,15 @@ public class BlindsService extends Service {
         }
     }
 
-    public void sendBroadcastInfo(){
-        long timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime();
+    public void sendBroadcastInfo() {
+        long timeToIncrease;
+        if (mTournamentInProgress){
+            timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime();
+        }else{
+            //if tournament is on pause we need to send saved time
+            timeToIncrease = mPauseLeftTime;
+        }
+
         String timeMessage = NotificationUtil.parseTime(timeToIncrease);
         Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
         intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
