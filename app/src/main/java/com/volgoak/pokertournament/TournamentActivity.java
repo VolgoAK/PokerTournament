@@ -29,7 +29,6 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     public static final String TIME_TO_INCREASE = "time_to_increase";
     public static final String CURRENT_BLIND = "current_blind";
     public static final String NEXT_BLIND = "next_blind";
-    public static final String SAVED_ICON_ID = "icon_id";
 
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
@@ -80,6 +79,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
                 tryToStopService();
             }
         });
+        mBinder.btEndTournament.setEnabled(false);
 
         //set font for clock
         Typeface font = Typeface.createFromAsset(getAssets(), "fonts/digits_bold.ttf");
@@ -129,12 +129,20 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         Log.d(TAG, "onServiceConnected: " + service);
         mBlindTimer = (BlindTimer) service;
         mBinder.btPauseTournament.setEnabled(true);
+        mBinder.btEndTournament.setEnabled(true);
+
+        //get info from service and show it.
+        //When app is resumed and timer service in a pause state
+        //it won't send data. So we need to fetch it manually.
+//        TournamentData td = mBlindTimer.get
     }
 
     @Override
     public void onServiceDisconnected(ComponentName name) {
         Log.d(TAG, "onServiceDisconnected: ");
         mBlindTimer = null;
+        mBinder.btPauseTournament.setEnabled(false);
+        mBinder.btEndTournament.setEnabled(false);
     }
 
     //call when stop button clicked. If clicked second time in five seconds it stops service

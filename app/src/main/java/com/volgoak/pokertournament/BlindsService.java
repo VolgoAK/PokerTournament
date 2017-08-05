@@ -119,6 +119,10 @@ public class BlindsService extends Service {
     public void onRebind(Intent intent) {
         Log.d(TAG, "onRebind: ");
         mIsBound = true;
+        //send info to activity manually if on pause
+        if(!mTournamentInProgress) {
+            sendBroadcastInfo();
+        }
     }
 
     private void startNewGame(Intent intent){
@@ -233,13 +237,18 @@ public class BlindsService extends Service {
 
         //Send info to tournament activity if service is bound
         if(mIsBound){
-            String timeMessage = NotificationUtil.parseTime(timeToIncrease);
-            Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
-            intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
-            intent.putExtra(TournamentActivity.CURRENT_BLIND, mBlinds);
-            intent.putExtra(TournamentActivity.NEXT_BLIND, mBlindsList.get(mRoundNum + 1));
-            sendBroadcast(intent);
+            sendBroadcastInfo();
         }
+    }
+
+    public void sendBroadcastInfo(){
+        long timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime();
+        String timeMessage = NotificationUtil.parseTime(timeToIncrease);
+        Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
+        intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
+        intent.putExtra(TournamentActivity.CURRENT_BLIND, mBlinds);
+        intent.putExtra(TournamentActivity.NEXT_BLIND, mBlindsList.get(mRoundNum + 1));
+        sendBroadcast(intent);
     }
 
     /**
