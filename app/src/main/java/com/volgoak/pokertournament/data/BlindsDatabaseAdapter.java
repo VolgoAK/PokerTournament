@@ -160,5 +160,12 @@ public class BlindsDatabaseAdapter {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_STRUCTURES);
             onCreate(db);
         }
+
+        @Override
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_BLINDS);
+            db.execSQL("DROP TABLE IF EXISTS " + TABLE_STRUCTURES);
+            onCreate(db);
+        }
     }
 }

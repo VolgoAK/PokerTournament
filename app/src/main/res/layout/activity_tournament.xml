@@ -74,27 +74,25 @@
         app:layout_constraintLeft_toLeftOf="@+id/tv_current_blinds_tourn"
         android:layout_marginTop="@dimen/views_vertical_margin" />
 
-    <Button
-        android:text="@string/pause"
+    <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:fabSize="normal"
         android:id="@+id/bt_pause_tournament"
-        style="@style/green_button"
-        android:layout_marginStart="@dimen/activity_horizontal_margin"
+        android:layout_margin="8dp"
         app:layout_constraintLeft_toLeftOf="parent"
        app:layout_constraintBottom_toTopOf="@+id/adView"
-        android:layout_marginBottom="@dimen/views_vertical_margin" />
+        app:srcCompat="@drawable/ic_pause_black_24dp"/>
 
-    <Button
-        android:text="@string/stop"
+    <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/green_button"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/ic_stop_black_24dp"
         android:id="@+id/bt_end_tournament"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/adView"
-        android:layout_marginBottom="@dimen/views_vertical_margin"
-        android:layout_marginEnd="@dimen/activity_horizontal_margin" />
+        android:layout_margin="8dp" />
 
     <com.google.android.gms.ads.AdView
         xmlns:ads="http://schemas.android.com/apk/res-auto"

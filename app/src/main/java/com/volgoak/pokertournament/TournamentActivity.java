@@ -10,10 +10,10 @@ import android.databinding.DataBindingUtil;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.ads.AdRequest;
@@ -29,7 +29,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     public static final String TIME_TO_INCREASE = "time_to_increase";
     public static final String CURRENT_BLIND = "current_blind";
     public static final String NEXT_BLIND = "next_blind";
-    public static final String CHANGE_STATE_TEXT = "change_state";
+    public static final String SAVED_ICON_ID = "icon_id";
 
     private BroadcastReceiver mReceiver;
     private IntentFilter mIntentFilter;
@@ -59,8 +59,8 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
             mBinder.tvCurrentBlindsTourn.setText(blinds);
             String nextBlinds = savedInstanceState.getString(NEXT_BLIND);
             mBinder.tvNextBlindsTour.setText(nextBlinds);
-            String stateButton = savedInstanceState.getString(CHANGE_STATE_TEXT);
-            mBinder.btPauseTournament.setText(stateButton);
+//            String stateButton = savedInstanceState.getString(CHANGE_STATE_TEXT);
+//            mBinder.btPauseTournament.setText(stateButton);
         }
 
         //set listener for pause/resume button
@@ -68,8 +68,8 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
             @Override
             public void onClick(View v) {
                 boolean isPaused = mBlindTimer.changeState();
-                if (isPaused) ((Button) v).setText(getString(R.string.resume));
-                else ((Button) v).setText(R.string.pause);
+                if (isPaused) ((FloatingActionButton) v).setImageResource(R.drawable.ic_play_arrow_black_24dp);
+                else ((FloatingActionButton) v).setImageResource(R.drawable.ic_pause_black_24dp);
             }
         });
         mBinder.btPauseTournament.setEnabled(false);
@@ -121,7 +121,7 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
         outState.putString(TIME_TO_INCREASE, mBinder.tvTimeToNextTournament.getText().toString());
         outState.putString(CURRENT_BLIND, mBinder.tvCurrentBlindsTourn.getText().toString());
         outState.putString(NEXT_BLIND, mBinder.tvNextBlindsTour.getText().toString());
-        outState.putString(CHANGE_STATE_TEXT, mBinder.btPauseTournament.getText().toString());
+        // TODO: 29.07.2017 save image for pause button
     }
 
     @Override
