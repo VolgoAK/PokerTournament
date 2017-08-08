@@ -29,6 +29,7 @@
     <string name="structure_slow">Slow</string>
     <string name="structure_mid">Medium</string>
     <string name="structure_fast">Fast</string>
+    <string name="about">About app</string>
 
     <string-array name="time_for_round">
         <item>1</item>

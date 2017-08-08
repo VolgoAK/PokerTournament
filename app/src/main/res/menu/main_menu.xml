@@ -7,4 +7,9 @@
         app:showAsAction="never"
         android:title="@string/change_structures"/>
 
+    <item android:id="@+id/menu_about"
+        android:orderInCategory="200"
+        app:showAsAction="never"
+        android:title="@string/about"/>
+
 </menu>

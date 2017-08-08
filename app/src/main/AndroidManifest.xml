@@ -23,8 +23,9 @@
         </activity>
         <activity
             android:name=".TournamentActivity"
-            android:launchMode="singleTop"></activity>
-        <activity android:name=".StructureSettingsActivity"></activity>
+            android:launchMode="singleTop" />
+        <activity android:name=".StructureSettingsActivity" />
+        <activity android:name=".AboutActivity"></activity>
     </application>
 
 </manifest>
