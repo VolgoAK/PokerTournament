@@ -25,7 +25,8 @@
             android:name=".TournamentActivity"
             android:launchMode="singleTop" />
         <activity android:name=".StructureSettingsActivity" />
-        <activity android:name=".AboutActivity"></activity>
+        <activity android:name=".AboutActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

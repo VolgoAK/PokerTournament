@@ -8,6 +8,11 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
     <style name="green_button">
         <item name="android:background">@drawable/green_button</item>
         <item name="android:layout_width">@dimen/start_button_size</item>
