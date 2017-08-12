@@ -46,7 +46,7 @@ public class NotificationUtil {
         Notification.Builder builder = new Notification.Builder(context)
                 .setPriority(Notification.PRIORITY_HIGH)
                 .setAutoCancel(true)
-                .setSmallIcon(R.drawable.poker_24p)
+                .setSmallIcon(R.drawable.ic_stat_timer)
                 .setLargeIcon(largeIcon(context))
                 .setContentIntent(pendingIntent(context));
 
@@ -73,7 +73,6 @@ public class NotificationUtil {
 
         return builder.build();
     }
-    // TODO: 14.01.2017 add silluete icon for version 21
 
     /**
      * Decodes icon bitmap for notification
@@ -82,7 +81,7 @@ public class NotificationUtil {
      */
     private static Bitmap largeIcon(Context context){
         Resources resources = context.getResources();
-        Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.poker_36p);
+        Bitmap icon = BitmapFactory.decodeResource(resources, R.drawable.ic_shortcut_notif);
         return icon;
     }
 

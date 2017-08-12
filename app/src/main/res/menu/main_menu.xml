@@ -2,10 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/menu_structures_setting"
+    <!--<item android:id="@+id/menu_structures_setting"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="@string/change_structures"/>
+        android:title="@string/change_structures"/>-->
 
     <item android:id="@+id/menu_about"
         android:orderInCategory="200"

@@ -13,7 +13,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
-    <style name="green_button">
+    <style name="title_text">
+        <item name="android:textSize">@dimen/title_fields_text_size</item>
+    </style>
+
+    <!--<style name="green_button">
         <item name="android:background">@drawable/green_button</item>
         <item name="android:layout_width">@dimen/start_button_size</item>
         <item name="android:layout_height">@dimen/start_button_size</item>
@@ -25,6 +29,6 @@
     <style name="start_button" parent="green_button">
         <item name="android:background">@drawable/orange_button</item>
         <item name="android:textColor">@color/colorVeryDarkGreen</item>
-    </style>
+    </style>-->
 
 </resources>

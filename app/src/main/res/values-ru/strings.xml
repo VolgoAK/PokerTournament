@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">HoldemTimer</string>
+
+    <string name="start_service">Start service</string>
+    <string name="blinds_is">Блайнды</string>
+    <string name="next_blinds">Следующие</string>
+    <string name="increase_in">Повышение через: </string>
+    <string name="blinds_increase">Ставки повышаются</string>
+    <string name="new_blinds">Новые блайнды: </string>
+    <string name="blinds_structure">Структура</string>
+    <string name="round_time">Время раунда</string>
+    <string name="start_blind">Начальные блайнды</string>
+    <string name="start">Старт</string>
+    <string name="stop">Стоп</string>
+    <string name="tap_one_more">Нажмите еще раз, чтобы выйти</string>
+
+    <string name="change_structures">Change structures</string>
+
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+
+    <string name="title_fragment_about">О приложении</string>
+    <string name="title_opensource">Сторонние библиотеки</string>
+
+    <string name="structure_slow">Медленно</string>
+    <string name="structure_mid">Нормально</string>
+    <string name="structure_fast">Быстро</string>
+
+    <string name="html_prefix">en</string>
+</resources>
