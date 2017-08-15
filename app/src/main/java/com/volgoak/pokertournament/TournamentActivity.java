@@ -114,6 +114,11 @@ public class TournamentActivity extends AppCompatActivity implements ServiceConn
     }
 
     @Override
+    public void onBackPressed() {
+        tryToStopService();
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(TIME_TO_INCREASE, mBinder.tvTimeToNextTournament.getText().toString());

@@ -20,7 +20,7 @@ public class BlindsDatabaseAdapter {
 
     public static final String TAG = BlindsDatabaseAdapter.class.getSimpleName();
 
-    public static final int DB_VERSION = 6;
+    public static final int DB_VERSION = 7;
     public static final String DB_NAME = "blinds_db";
 
     public static final String TABLE_STRUCTURES = "structures_table";

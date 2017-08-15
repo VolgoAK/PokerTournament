@@ -13,7 +13,7 @@
     <string name="start_blind">Начальные блайнды</string>
     <string name="start">Старт</string>
     <string name="stop">Стоп</string>
-    <string name="tap_one_more">Нажмите еще раз, чтобы выйти</string>
+    <string name="tap_one_more">Нажмите еще раз, чтобы завершить</string>
 
     <string name="change_structures">Change structures</string>
 
@@ -27,5 +27,5 @@
     <string name="structure_mid">Нормально</string>
     <string name="structure_fast">Быстро</string>
 
-    <string name="html_prefix">en</string>
+    <string name="html_prefix">ru</string>
 </resources>
