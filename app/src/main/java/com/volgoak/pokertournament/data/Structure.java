@@ -1,20 +1,34 @@
 package com.volgoak.pokertournament.data;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
- * Created by Volgoak on 30.01.2017.
+ * Created by alex on 3/5/18.
  */
 
-public class Structure {
-    public String name;
-    public long id;
+public class Structure implements Serializable{
+    private String name;
+    private List<Blind> blinds;
 
-    public Structure(String name, long id){
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
         this.name = name;
-        this.id = id;
+    }
+
+    public List<Blind> getBlinds() {
+        return blinds;
+    }
+
+    public void setBlinds(List<Blind> blinds) {
+        this.blinds = blinds;
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         return name;
     }
 }

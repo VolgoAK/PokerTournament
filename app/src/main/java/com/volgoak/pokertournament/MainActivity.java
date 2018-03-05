@@ -12,8 +12,9 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aigestudio.wheelpicker.WheelPicker;
-import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
 import com.volgoak.pokertournament.data.Structure;
+
+import com.volgoak.pokertournament.data.StructureProvider;
 import com.volgoak.pokertournament.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
@@ -31,19 +32,12 @@ public class MainActivity extends AppCompatActivity{
 
     private List<Structure> mStructureList;
     private List<String> mTimeList;
-    private ArrayList<String> mBlindsList;
-    private BlindsDatabaseAdapter mDbAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //!!!!!!!!!!
-        //delete after recreating db
-//        String prefTitle = getString(R.string.db_created_pref);
-//        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-//        preferences.edit().putBoolean(prefTitle, false).apply();
 
         //check if BlindsService already started
         boolean isServiceRunning = isTournamentStarted();
@@ -53,9 +47,6 @@ public class MainActivity extends AppCompatActivity{
             startActivity(intent);
             finish();
         }
-
-        //initialize sql database adapter
-        mDbAdapter = new BlindsDatabaseAdapter(this);
         //initialize dataBinder
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
@@ -68,18 +59,18 @@ public class MainActivity extends AppCompatActivity{
         setupWheel(mBinding.wheelRoundTimeMain);
 
         //setup structure wheelPicker
-        mStructureList = mDbAdapter.getStructures();
+        mStructureList = StructureProvider.getStructures(this);
         mBinding.wheelBlindsStructureMain.setData(mStructureList);
         setupWheel(mBinding.wheelBlindsStructureMain);
         mBinding.wheelBlindsStructureMain.setOnItemSelectedListener(new WheelPicker.OnItemSelectedListener() {
             @Override
             public void onItemSelected(WheelPicker picker, Object data, int position) {
-                renewBlindsList();
+                renewBlindsList(position);
             }
         });
 
         //setup blinds wheel
-        renewBlindsList();
+        renewBlindsList(0);
         setupWheel(mBinding.wheelStartBlindMain);
 
         //create listener for the start button
@@ -124,9 +115,12 @@ public class MainActivity extends AppCompatActivity{
 
         int startBlindPosition = mBinding.wheelStartBlindMain.getCurrentItemPosition();
 
+        Structure selectedStructure = mStructureList
+                .get(mBinding.wheelBlindsStructureMain.getCurrentItemPosition());
+
         //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
-        intent.putExtra(BlindsService.EXTRA_BLINDS_ARRAY, mBlindsList);
+        intent.putExtra(BlindsService.EXTRA_STRUCTURE, selectedStructure);
         intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
         intent.putExtra(BlindsService.EXTRA_START_ROUND, --startBlindPosition);
         intent.setAction(BlindsService.START_GAME_ACTION);
@@ -151,10 +145,9 @@ public class MainActivity extends AppCompatActivity{
     }
 
     //renew start blind wheel
-    private void renewBlindsList(){
-        Structure structure = mStructureList.get(mBinding.wheelBlindsStructureMain.getCurrentItemPosition());
-        mBlindsList = mDbAdapter.getBlinds(structure);
-        mBinding.wheelStartBlindMain.setData(mBlindsList);
+    private void renewBlindsList(int position){
+        Structure structure = mStructureList.get(position);
+        mBinding.wheelStartBlindMain.setData(structure.getBlinds());
     }
 
     /**

@@ -1,12 +1,12 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         applicationId "com.volgoak.pokertournament"
         minSdkVersion 18
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -19,6 +19,15 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+ext{
+    support = "27.0.2"
 }
 
 dependencies {
@@ -27,11 +36,13 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:appcompat-v7:25.1.1'
+    compile "com.android.support:appcompat-v7:$support"
+    compile "com.android.support:support-v4:$support"
+    compile "com.android.support:design:$support"
+    compile 'com.google.code.gson:gson:2.8.2'
     compile 'cn.aigestudio.wheelpicker:WheelPicker:1.1.2'
     compile 'com.google.android.gms:play-services-ads:10.2.4'
-    compile 'com.android.support:design:25.3.1'
     compile 'com.artit-k:license-fragment-support-v4:1.3.0'
-    compile 'com.android.support:support-v4:25.3.1'
+    compile 'org.greenrobot:eventbus:3.1.1'
     testCompile 'junit:junit:4.12'
 }

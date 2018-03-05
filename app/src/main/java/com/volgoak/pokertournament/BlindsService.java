@@ -12,9 +12,16 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.volgoak.pokertournament.data.Blind;
+import com.volgoak.pokertournament.data.Structure;
+import com.volgoak.pokertournament.utils.BlindEvent;
+import com.volgoak.pokertournament.utils.ControlEvent;
 import com.volgoak.pokertournament.utils.NotificationUtil;
 
-import java.util.ArrayList;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.List;
 
 /**
  * Service maintains lifecycle of tournament.
@@ -31,18 +38,14 @@ public class BlindsService extends Service {
 
     //Constants for Intent extra
     public static final String EXTRA_ROUND_TIME = "round_time";
-    //public static final String EXTRA_START_BLINDS = "start_blinds";
-    public static final String EXTRA_BLINDS_ARRAY = "blinds_array";
     public static final String EXTRA_START_ROUND = "start_round";
+    public static final String EXTRA_STRUCTURE = "structure_extra";
 
     //Thread for countdown clock
     private Thread mGameThread;
 
     //Timer is ticking while true
     private volatile boolean mTournamentInProgress;
-
-    //Is service bound to an activity
-    private boolean mIsBound;
 
     //Blinds stored in array of Strings, so we need to know
     //num of round to pick correct string
@@ -58,10 +61,12 @@ public class BlindsService extends Service {
     private long mPauseLeftTime;
 
     //All blinds are stored here
-    private ArrayList<String> mBlindsList;
+    private List<Blind> mBlindsList;
 
     //Current blinds
     private String mBlinds;
+
+    private Structure mStructure;
 
     //Service uses a WakeLock for don't allow system
     //to sleep
@@ -71,6 +76,7 @@ public class BlindsService extends Service {
     public void onCreate() {
         PowerManager pm = (PowerManager)getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log");
+        EventBus.getDefault().register(this);
     }
 
     /**
@@ -95,45 +101,25 @@ public class BlindsService extends Service {
     public void onDestroy() {
         Log.d(TAG, "onDestroy");
         mTournamentInProgress = false;
+        EventBus.getDefault().unregister(this);
     }
 
-    /**
-    * Returns binder when Activity call BindService()
-     */
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        Log.d(TAG, "onBind: ");
-        mIsBound = true;
-       return new ITimer();
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        Log.d(TAG, "onUnbind: ");
-        mIsBound = false;
-        return true;
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        Log.d(TAG, "onRebind: ");
-        mIsBound = true;
-        //send info to activity manually if on pause
-        if(!mTournamentInProgress) {
-            sendBroadcastInfo();
-        }
+        return null;
     }
 
     private void startNewGame(Intent intent){
         //doesn't allow system go to sleep mode
         mWakeLock.acquire();
-        Log.d(TAG, "startGame: ");
 
         //data from intent
         mRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0);
-        mBlindsList = intent.getStringArrayListExtra(EXTRA_BLINDS_ARRAY);
+        mStructure = (Structure) intent.getSerializableExtra(EXTRA_STRUCTURE);
         mRoundNum = intent.getIntExtra(EXTRA_START_ROUND, -1);
+
+        mBlindsList = mStructure.getBlinds();
 
         //set increase time and blinds
         startNextRound();
@@ -143,14 +129,23 @@ public class BlindsService extends Service {
         mGameThread.start();
     }
 
+    @Subscribe
+    public void onStateEvent(ControlEvent event) {
+        if(event.type == ControlEvent.Type.STOP) {
+            stop();
+        } else if(event.type == ControlEvent.Type.CHANGE_STATE) {
+            changeState();
+        }
+    }
+
     /**
      * Increases blinds and renew time
      */
     private void startNextRound(){
-        // TODO: 21.03.2017 fix error when no more blinds in an array
+        // TODO: 21.03.2017 create new blinds smartly
         mRoundNum++;
         Log.d(TAG, "startNextRound: mRoundNum is " + mRoundNum);
-        mBlinds = mBlindsList.get(mRoundNum);
+        mBlinds = mBlindsList.get(mRoundNum).toString();
 
         if(mRoundNum == mBlindsList.size() - 1) produceBlinds();
 
@@ -163,11 +158,13 @@ public class BlindsService extends Service {
      * for avoid IndexOfBoundException
      */
     private void produceBlinds(){
-        String[] blinds = mBlindsList.get(mBlindsList.size() - 1).split("/");
-        int smallBlind = Integer.parseInt(blinds[0]) * 2;
+        Blind currentBlind = mBlindsList.get(mBlindsList.size() - 1);
+        int smallBlind = currentBlind.getSb() * 2;
         int bigBlind = smallBlind * 2;
-        String newBlinds = smallBlind + "/" + bigBlind;
-        mBlindsList.add(newBlinds);
+        Blind newBlind = new Blind();
+        newBlind.setSb(smallBlind);
+        newBlind.setBb(bigBlind);
+        mBlindsList.add(newBlind);
     }
 
     /**
@@ -180,6 +177,7 @@ public class BlindsService extends Service {
             mTournamentInProgress = false;
             mGameThread.interrupt();
             mWakeLock.release();
+            notifyTimer();
             return true;
         }else{
             mIncreaseTime = SystemClock.elapsedRealtime() + mPauseLeftTime;
@@ -188,6 +186,7 @@ public class BlindsService extends Service {
             mGameThread = new Thread(new BlindTimerThread());
             mGameThread.start();
             mWakeLock.acquire();
+            notifyTimer();
             return false;
         }
     }
@@ -202,10 +201,6 @@ public class BlindsService extends Service {
             mWakeLock.release();
         }
         stopSelf();
-    }
-
-    private boolean isPaused(){
-        return !mTournamentInProgress;
     }
 
     private void notifyTimer(){
@@ -235,27 +230,10 @@ public class BlindsService extends Service {
         Notification notification = NotificationUtil.createNotification(this, notBundle);
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
 
-        //Send info to tournament activity if service is bound
-        if(mIsBound){
-            sendBroadcastInfo();
-        }
-    }
-
-    public void sendBroadcastInfo() {
-        long timeToIncrease;
-        if (mTournamentInProgress){
-            timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime();
-        }else{
-            //if tournament is on pause we need to send saved time
-            timeToIncrease = mPauseLeftTime;
-        }
-
-        String timeMessage = NotificationUtil.parseTime(timeToIncrease);
-        Intent intent = new Intent(TournamentActivity.RECEIVER_CODE);
-        intent.putExtra(TournamentActivity.TIME_TO_INCREASE, timeMessage);
-        intent.putExtra(TournamentActivity.CURRENT_BLIND, mBlinds);
-        intent.putExtra(TournamentActivity.NEXT_BLIND, mBlindsList.get(mRoundNum + 1));
-        sendBroadcast(intent);
+        Blind currentBlind = mBlindsList.get(mRoundNum);
+        Blind nextBlint = mBlindsList.get(mRoundNum + 1);
+        BlindEvent event = new BlindEvent(currentBlind, nextBlint, timeToIncrease, mTournamentInProgress);
+        EventBus.getDefault().postSticky(event);
     }
 
     /**
@@ -275,18 +253,6 @@ public class BlindsService extends Service {
                     notifyTimer();
             }
         }
-    }
-
-    //Binder class with callback methods
-    private class ITimer extends Binder implements BlindTimer{
-       public boolean changeState(){
-          return BlindsService.this.changeState();
-       }
-
-       public void stop(){
-           BlindsService.this.stop();
-       }
-
     }
 }
 
