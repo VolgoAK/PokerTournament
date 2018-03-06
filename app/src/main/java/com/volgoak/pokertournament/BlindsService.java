@@ -227,7 +227,10 @@ public class BlindsService extends Service {
         //add info about mBlinds
         notBundle.putString(NotificationUtil.EXTRA_BLINDS, mBlinds);
 
-        Notification notification = NotificationUtil.createNotification(this, notBundle);
+        String channel = timeToIncrease < 0
+                ? NotificationUtil.CHANNEL_ID_IMPORTANT : NotificationUtil.CHANNEL_ID_SILENT;
+
+        Notification notification = NotificationUtil.createNotification(this, notBundle, channel);
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
 
         Blind currentBlind = mBlindsList.get(mRoundNum);

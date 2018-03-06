@@ -3,6 +3,7 @@ package com.volgoak.pokertournament;
 import android.app.ActivityManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.aigestudio.wheelpicker.WheelPicker;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.volgoak.pokertournament.data.Structure;
 
 import com.volgoak.pokertournament.data.StructureProvider;
@@ -38,6 +40,7 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        FirebaseAnalytics.getInstance(this);
 
         //check if BlindsService already started
         boolean isServiceRunning = isTournamentStarted();
