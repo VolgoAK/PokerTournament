@@ -6,8 +6,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import com.volgoak.pokertournament.admob.AdsManager;
+import com.volgoak.pokertournament.admob.Banner;
+import com.volgoak.pokertournament.admob.Interstitial;
 import com.volgoak.pokertournament.databinding.ActivityTournamentBinding;
 import com.volgoak.pokertournament.utils.BlindEvent;
 import com.volgoak.pokertournament.utils.ControlEvent;
@@ -30,6 +34,8 @@ public class TournamentActivity extends AppCompatActivity {
     private boolean mStopWasClicked;
     private boolean isTimerActive;
 
+    private Banner banner;
+    private Interstitial interstitial;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +68,15 @@ public class TournamentActivity extends AppCompatActivity {
         mBinder.tvCurrentBlindsTourn.setTypeface(font);
         mBinder.tvNextBlindsTour.setTypeface(font);
 
+        if(AdsManager.INSTANCE.getInitialized()) {
+            LinearLayout bannerLL = findViewById(R.id.llBanner);
+            banner = new Banner(this);
+            banner.loadAdRequest();
+            banner.setTargetView(bannerLL);
+
+            interstitial = new Interstitial(this);
+            interstitial.loadAd();
+        }
     }
 
     @Override
@@ -69,6 +84,10 @@ public class TournamentActivity extends AppCompatActivity {
         super.onResume();
         if (!EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().register(this);
+
+        if(banner != null) {
+            banner.onResume();
+        }
     }
 
     @Override
@@ -76,6 +95,19 @@ public class TournamentActivity extends AppCompatActivity {
         super.onPause();
         if (EventBus.getDefault().isRegistered(this))
             EventBus.getDefault().unregister(this);
+
+        if(banner != null) {
+            banner.onPause();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if(banner != null) {
+            banner.onDestroy();
+        }
     }
 
     @Override
@@ -104,6 +136,7 @@ public class TournamentActivity extends AppCompatActivity {
             Intent intent = new Intent(TournamentActivity.this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
+            interstitial.showAd();
             finish();
         }
     }
