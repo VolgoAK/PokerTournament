@@ -4,7 +4,6 @@ import android.app.Notification;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -125,7 +124,7 @@ public class BlindsService extends Service {
         startNextRound();
         //start game thread
         mTournamentInProgress = true;
-        mGameThread = new Thread(new BlindTimerThread());
+        mGameThread = new Thread(new BlindTimerRunnable());
         mGameThread.start();
     }
 
@@ -182,8 +181,8 @@ public class BlindsService extends Service {
         }else{
             mIncreaseTime = SystemClock.elapsedRealtime() + mPauseLeftTime;
             mTournamentInProgress = true;
-            //mExecutor.execute(new BlindTimerThread());
-            mGameThread = new Thread(new BlindTimerThread());
+            //mExecutor.execute(new BlindTimerRunnable());
+            mGameThread = new Thread(new BlindTimerRunnable());
             mGameThread.start();
             mWakeLock.acquire();
             notifyTimer();
@@ -234,8 +233,8 @@ public class BlindsService extends Service {
         startForeground(NotificationUtil.NOTIFICATION_COD, notification);
 
         Blind currentBlind = mBlindsList.get(mRoundNum);
-        Blind nextBlint = mBlindsList.get(mRoundNum + 1);
-        BlindEvent event = new BlindEvent(currentBlind, nextBlint, timeToIncrease, mTournamentInProgress);
+        Blind nextBlind = mBlindsList.get(mRoundNum + 1);
+        BlindEvent event = new BlindEvent(currentBlind, nextBlind, timeToIncrease, mTournamentInProgress);
         EventBus.getDefault().postSticky(event);
     }
 
@@ -243,7 +242,7 @@ public class BlindsService extends Service {
      * Simple runnable class which call notifyTimer()
      * every one second
      */
-    private class BlindTimerThread implements Runnable{
+    private class BlindTimerRunnable implements Runnable{
         @Override
         public void run() {
             Log.d(TAG, "run: ");

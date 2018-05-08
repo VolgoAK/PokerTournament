@@ -21,7 +21,6 @@ public class TournamentActivity extends AppCompatActivity {
 
     public static final String TAG = "TournamentActivity";
     //BroadcastReceiver fields
-    public static final String RECEIVER_CODE = "com.volgoak.pokertournament.BlindsBroadCastReceiver";
     public static final String TIME_TO_INCREASE = "time_to_increase";
     public static final String CURRENT_BLIND = "current_blind";
     public static final String NEXT_BLIND = "next_blind";

@@ -15,6 +15,12 @@
     <string name="stop">Стоп</string>
     <string name="tap_one_more">Нажмите еще раз, чтобы завершить</string>
 
+    <string-array name="blinds_structures">
+        <item>Медленно</item>
+        <item>Средне</item>
+        <item>Быстро</item>
+    </string-array>
+
     <string name="change_structures">Change structures</string>
 
     <string name="pause">Pause</string>
@@ -28,4 +34,5 @@
     <string name="structure_fast">Быстро</string>
 
     <string name="html_prefix">ru</string>
+    <string name="about">О приложении</string>
 </resources>

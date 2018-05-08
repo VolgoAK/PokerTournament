@@ -54,9 +54,8 @@ public class MainActivity extends AppCompatActivity{
         mBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
 
         //get strings with time options and setup wheelPicker with time
-        String[] timeArray = getResources().getStringArray(R.array.time_for_round);
         mTimeList = new ArrayList<>();
-        Collections.addAll(mTimeList, timeArray);
+        for(int i = 1; i < 41; i++) mTimeList.add(String.valueOf(i));
 
         mBinding.wheelRoundTimeMain.setData(mTimeList);
         setupWheel(mBinding.wheelRoundTimeMain);
