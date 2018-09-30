@@ -1,6 +1,8 @@
 package com.volgoak.pokertournament
 
 import android.app.Application
+import com.google.ads.consent.ConsentInformation
+import com.google.ads.consent.DebugGeography
 import com.volgoak.pokertournament.admob.AdsManager
 
 /**

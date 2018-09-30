@@ -5,18 +5,14 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
 
-class Interstitial(context: Context) {
+class Interstitial(context: Context,
+                   interstitialId: String,
+                   val request: AdRequest) {
 
     private var mInterstitialAd = InterstitialAd(context)
-    private var mAdRequest: AdRequest
-    private var mAdRequestBuilder: AdRequest.Builder
 
     init {
-        mInterstitialAd = InterstitialAd(context)
-        mInterstitialAd.adUnitId = AdsManager.getInterstitialId()
-        mAdRequestBuilder = AdRequest.Builder()
-
-        mAdRequest = mAdRequestBuilder.build()
+        mInterstitialAd.adUnitId = interstitialId
     }
 
 
@@ -27,7 +23,7 @@ class Interstitial(context: Context) {
 
     fun loadAd() {
         if (!mInterstitialAd.isLoaded && !mInterstitialAd.isLoading) {
-            mInterstitialAd.loadAd(mAdRequest)
+            mInterstitialAd.loadAd(request)
         }
     }
 

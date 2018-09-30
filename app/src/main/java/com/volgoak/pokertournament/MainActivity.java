@@ -14,6 +14,9 @@ import android.view.View;
 
 import com.aigestudio.wheelpicker.WheelPicker;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.volgoak.pokertournament.admob.AdsManager;
+
+import com.volgoak.pokertournament.admob.ConsentManager;
 import com.volgoak.pokertournament.data.Structure;
 
 import com.volgoak.pokertournament.data.StructureProvider;
@@ -82,6 +85,8 @@ public class MainActivity extends AppCompatActivity{
                 startGame();
             }
         });
+
+        AdsManager.INSTANCE.checkConsent(this);
     }
 
     @Override
