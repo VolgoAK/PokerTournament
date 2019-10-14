@@ -5,8 +5,8 @@ package com.volgoak.pokertournament;
  */
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
 import com.volgoak.pokertournament.data.Structure;

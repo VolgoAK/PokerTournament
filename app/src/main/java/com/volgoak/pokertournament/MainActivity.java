@@ -2,10 +2,10 @@ package com.volgoak.pokertournament;
 
 import android.app.ActivityManager;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
-import android.graphics.Color;
+import androidx.databinding.DataBindingUtil;
+
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -16,14 +16,12 @@ import com.aigestudio.wheelpicker.WheelPicker;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.volgoak.pokertournament.admob.AdsManager;
 
-import com.volgoak.pokertournament.admob.ConsentManager;
 import com.volgoak.pokertournament.data.Structure;
 
 import com.volgoak.pokertournament.data.StructureProvider;
 import com.volgoak.pokertournament.databinding.ActivityMainBinding;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity{
@@ -127,10 +125,10 @@ public class MainActivity extends AppCompatActivity{
 
         //Put tournament info into Intent and start service
         Intent intent = new Intent(this, BlindsService.class);
-        intent.putExtra(BlindsService.EXTRA_STRUCTURE, selectedStructure);
-        intent.putExtra(BlindsService.EXTRA_ROUND_TIME, roundTime);
-        intent.putExtra(BlindsService.EXTRA_START_ROUND, --startBlindPosition);
-        intent.setAction(BlindsService.START_GAME_ACTION);
+        intent.putExtra(BlindsService.Companion.getEXTRA_STRUCTURE(), selectedStructure);
+        intent.putExtra(BlindsService.Companion.getEXTRA_ROUND_TIME(), roundTime);
+        intent.putExtra(BlindsService.Companion.getEXTRA_START_ROUND(), --startBlindPosition);
+        intent.setAction(BlindsService.Companion.getSTART_GAME_ACTION());
         startService(intent);
 
         //Start tournament activity
