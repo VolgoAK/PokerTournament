@@ -1,5 +1,6 @@
 package com.volgoak.pokertournament
 
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
@@ -32,6 +33,8 @@ class TournamentActivity : AppCompatActivity() {
         private const val TIME_TO_INCREASE = "time_to_increase"
         private const val CURRENT_BLIND = "current_blind"
         private const val NEXT_BLIND = "next_blind"
+
+        fun getIntent(context: Context) = Intent(context, TournamentActivity::class.java)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

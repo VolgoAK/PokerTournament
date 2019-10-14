@@ -4,6 +4,9 @@ import android.app.Application
 import com.google.ads.consent.ConsentInformation
 import com.google.ads.consent.DebugGeography
 import com.volgoak.pokertournament.admob.AdsManager
+import com.volgoak.pokertournament.di.appModule
+import org.koin.android.ext.koin.androidContext
+import org.koin.core.context.startKoin
 import timber.log.Timber
 
 /**
@@ -13,6 +16,11 @@ class App : Application(){
 
     override fun onCreate() {
         super.onCreate()
+        startKoin {
+            androidContext(this@App)
+            modules(listOf(appModule))
+        }
+
         AdsManager.initAds(this)
 
         if(BuildConfig.DEBUG) {

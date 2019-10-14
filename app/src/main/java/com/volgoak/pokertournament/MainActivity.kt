@@ -1,6 +1,5 @@
 package com.volgoak.pokertournament
 
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -13,8 +12,8 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.data.Structure
 import com.volgoak.pokertournament.data.StructureProvider
+import com.volgoak.pokertournament.service.BlindsService
 import kotlinx.android.synthetic.main.activity_main.*
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +21,8 @@ class MainActivity : AppCompatActivity() {
         private const val SAVED_TIME_POSITION = "saved_time"
         private const val SAVED_BLIND_POSITION = "saved_blind"
         private const val SAVED_STRUCTURE_POSITION = "saved_structure"
+
+        fun getIntent(context: Context) = Intent(context, MainActivity::class.java)
     }
 
     private var mStructureList: List<Structure>? = null

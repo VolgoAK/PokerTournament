@@ -1,4 +1,4 @@
-package com.volgoak.pokertournament
+package com.volgoak.pokertournament.service
 
 import android.app.Service
 import android.content.Context
@@ -18,6 +18,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
@@ -47,10 +48,8 @@ class BlindsService : Service() {
         }
     }
 
-    //Thread for countdown clock
-    //private var gameThread: Thread? = null
+    private val stateRepository: ServiceStateRepository by inject()
 
-    //Timer is ticking while true
     @Volatile
     private var tournamentInProgress: Boolean = false
 
@@ -62,7 +61,7 @@ class BlindsService : Service() {
     private var currentBlinds: String? = null
     private var structure: Structure? = null
 
-    private val timedDisposable = SerialDisposable()
+    private val timerDisposable = SerialDisposable()
 
     //Service uses a WakeLock for don't allow system
     //to sleep
@@ -72,6 +71,8 @@ class BlindsService : Service() {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
         wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log")
         EventBus.getDefault().register(this)
+        timerDisposable.isDisposed
+        stateRepository.serviceRunning = true
     }
 
     /**
@@ -92,6 +93,7 @@ class BlindsService : Service() {
         Timber.d("TESTING service onDestroy called")
         tournamentInProgress = false
         EventBus.getDefault().unregister(this)
+        stateRepository.serviceRunning = false
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -162,7 +164,7 @@ class BlindsService : Service() {
             pauseLeftTime = increaseTime - SystemClock.elapsedRealtime()
             tournamentInProgress = false
             wakeLock!!.release()
-            timedDisposable.dispose()
+            timerDisposable.dispose()
             notifyTimer()
             return true
         } else {
@@ -182,7 +184,7 @@ class BlindsService : Service() {
                     notifyTimer()
                 }, {
                     Timber.e(it)
-                }) into timedDisposable
+                }) into timerDisposable
     }
 
     /**
@@ -194,6 +196,7 @@ class BlindsService : Service() {
         if (wakeLock!!.isHeld) {
             wakeLock!!.release()
         }
+        timerDisposable.dispose()
         stopSelf()
     }
 
