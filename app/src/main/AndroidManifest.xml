@@ -3,6 +3,7 @@
     package="com.volgoak.pokertournament">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -26,8 +27,9 @@
             android:name=".TournamentActivity"
             android:launchMode="singleTop" />
         <activity android:name=".StructureSettingsActivity" />
-        <activity android:name=".AboutActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".AboutActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
     </application>
 
 </manifest>

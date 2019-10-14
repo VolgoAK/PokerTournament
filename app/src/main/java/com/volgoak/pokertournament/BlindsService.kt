@@ -1,6 +1,5 @@
 package com.volgoak.pokertournament
 
-import android.app.Notification
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -8,16 +7,19 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
-import android.util.Log
-
 import com.volgoak.pokertournament.data.Blind
 import com.volgoak.pokertournament.data.Structure
+import com.volgoak.pokertournament.extensions.into
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
 import com.volgoak.pokertournament.utils.NotificationUtil
-
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.SerialDisposable
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
+import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * Service maintains lifecycle of tournament.
@@ -28,41 +30,39 @@ import org.greenrobot.eventbus.Subscribe
 
 class BlindsService : Service() {
 
+    companion object {
+        val START_GAME_ACTION = "start_game"
+
+        //Constants for Intent extra
+        val EXTRA_ROUND_TIME = "round_time"
+        val EXTRA_START_ROUND = "start_round"
+        val EXTRA_STRUCTURE = "structure_extra"
+    }
+
     //Thread for countdown clock
-    private var mGameThread: Thread? = null
+    //private var gameThread: Thread? = null
 
     //Timer is ticking while true
     @Volatile
-    private var mTournamentInProgress: Boolean = false
+    private var tournamentInProgress: Boolean = false
 
-    //Blinds stored in array of Strings, so we need to know
-    //num of round to pick correct string
-    private var mRoundNum: Int = 0
+    private var roundNum: Int = 0
+    private var roundTime: Long = 0
+    private var increaseTime: Long = 0
+    private var pauseLeftTime: Long = 0
+    private var blindsList: MutableList<Blind>? = null
+    private var currentBlinds: String? = null
+    private var structure: Structure? = null
 
-    //Time for round in millis
-    private var mRoundTime: Long = 0
-
-    //Time to increase blinds
-    private var mIncreaseTime: Long = 0
-
-    //When game paused service save time
-    private var mPauseLeftTime: Long = 0
-
-    //All blinds are stored here
-    private var mBlindsList: MutableList<Blind>? = null
-
-    //Current blinds
-    private var mBlinds: String? = null
-
-    private var mStructure: Structure? = null
+    private val timedDisposable = SerialDisposable()
 
     //Service uses a WakeLock for don't allow system
     //to sleep
-    private var mWakeLock: PowerManager.WakeLock? = null
+    private var wakeLock: PowerManager.WakeLock? = null
 
     override fun onCreate() {
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log")
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log")
         EventBus.getDefault().register(this)
     }
 
@@ -75,8 +75,8 @@ class BlindsService : Service() {
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         // TODO: 21.03.2017 fix error with nullpointexception on intent
         val taskAction = intent.action
-        Log.d(TAG, "onStartCommand: action " + taskAction!!)
-        if (!mTournamentInProgress && START_GAME_ACTION == taskAction) {
+        Timber.d("TESTING onStartCommand: action $taskAction")
+        if (!tournamentInProgress && START_GAME_ACTION == taskAction) {
             startNewGame(intent)
             return Service.START_STICKY
         }
@@ -84,8 +84,8 @@ class BlindsService : Service() {
     }
 
     override fun onDestroy() {
-        Log.d(TAG, "onDestroy")
-        mTournamentInProgress = false
+        Timber.d("TESTING service onDestroy called")
+        tournamentInProgress = false
         EventBus.getDefault().unregister(this)
     }
 
@@ -95,21 +95,19 @@ class BlindsService : Service() {
 
     private fun startNewGame(intent: Intent) {
         //doesn't allow system go to sleep mode
-        mWakeLock!!.acquire()
+        wakeLock!!.acquire()
 
         //data from intent
-        mRoundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0)
-        mStructure = intent.getSerializableExtra(EXTRA_STRUCTURE) as Structure
-        mRoundNum = intent.getIntExtra(EXTRA_START_ROUND, -1)
+        roundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0)
+        structure = intent.getSerializableExtra(EXTRA_STRUCTURE) as Structure
+        roundNum = intent.getIntExtra(EXTRA_START_ROUND, -1)
 
-        mBlindsList = mStructure!!.blinds
+        blindsList = structure!!.blinds
 
         //set increase time and blinds
         startNextRound()
-        //start game thread
-        mTournamentInProgress = true
-        mGameThread = Thread(BlindTimerRunnable())
-        mGameThread!!.start()
+        runTimer()
+        tournamentInProgress = true
     }
 
     @Subscribe
@@ -126,13 +124,13 @@ class BlindsService : Service() {
      */
     private fun startNextRound() {
         // TODO: 21.03.2017 create new blinds smartly
-        mRoundNum++
-        Log.d(TAG, "startNextRound: mRoundNum is $mRoundNum")
-        mBlinds = mBlindsList!![mRoundNum].toString()
+        roundNum++
+        Timber.d("startNextRound: roundNum is $roundNum")
+        currentBlinds = blindsList!![roundNum].toString()
 
-        if (mRoundNum == mBlindsList!!.size - 1) produceBlinds()
+        if (roundNum == blindsList!!.size - 1) produceBlinds()
 
-        mIncreaseTime = SystemClock.elapsedRealtime() + mRoundTime
+        increaseTime = SystemClock.elapsedRealtime() + roundTime
     }
 
     /**
@@ -141,13 +139,13 @@ class BlindsService : Service() {
      * for avoid IndexOfBoundException
      */
     private fun produceBlinds() {
-        val currentBlind = mBlindsList!![mBlindsList!!.size - 1]
+        val currentBlind = blindsList!![blindsList!!.size - 1]
         val smallBlind = currentBlind.sb * 2
         val bigBlind = smallBlind * 2
         val newBlind = Blind()
         newBlind.sb = smallBlind
         newBlind.bb = bigBlind
-        mBlindsList!!.add(newBlind)
+        blindsList!!.add(newBlind)
     }
 
     /**
@@ -155,39 +153,47 @@ class BlindsService : Service() {
      * @return true if state changed to pause, false if to active
      */
     private fun changeState(): Boolean {
-        if (mTournamentInProgress) {
-            mPauseLeftTime = mIncreaseTime - SystemClock.elapsedRealtime()
-            mTournamentInProgress = false
-            mGameThread!!.interrupt()
-            mWakeLock!!.release()
+        if (tournamentInProgress) {
+            pauseLeftTime = increaseTime - SystemClock.elapsedRealtime()
+            tournamentInProgress = false
+            wakeLock!!.release()
+            timedDisposable.dispose()
             notifyTimer()
             return true
         } else {
-            mIncreaseTime = SystemClock.elapsedRealtime() + mPauseLeftTime
-            mTournamentInProgress = true
-            //mExecutor.execute(new BlindTimerRunnable());
-            mGameThread = Thread(BlindTimerRunnable())
-            mGameThread!!.start()
-            mWakeLock!!.acquire()
+            increaseTime = SystemClock.elapsedRealtime() + pauseLeftTime
+            tournamentInProgress = true
+            runTimer()
+            wakeLock!!.acquire()
             notifyTimer()
             return false
         }
+    }
+
+    private fun runTimer() {
+        Observable.interval(1000, TimeUnit.MILLISECONDS)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    notifyTimer()
+                }, {
+                    Timber.e(it)
+                }) into timedDisposable
     }
 
     /**
      * destroy service
      */
     private fun stop() {
-        mTournamentInProgress = false
-        mRoundNum = 0
-        if (mWakeLock!!.isHeld) {
-            mWakeLock!!.release()
+        tournamentInProgress = false
+        roundNum = 0
+        if (wakeLock!!.isHeld) {
+            wakeLock!!.release()
         }
         stopSelf()
     }
 
     private fun notifyTimer() {
-        val timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime()
+        val timeToIncrease = increaseTime - SystemClock.elapsedRealtime()
         showNotification()
         if (timeToIncrease < 0) startNextRound()
     }
@@ -200,7 +206,7 @@ class BlindsService : Service() {
     fun showNotification() {
         val notBundle = Bundle()
         //add action - show timer
-        val timeToIncrease = mIncreaseTime - SystemClock.elapsedRealtime()
+        val timeToIncrease = increaseTime - SystemClock.elapsedRealtime()
         val action = if (timeToIncrease < 0)
             NotificationUtil.ROUND_ENDED
         else
@@ -209,8 +215,8 @@ class BlindsService : Service() {
         //add time to increase
 
         notBundle.putLong(NotificationUtil.EXTRA_TIME, timeToIncrease)
-        //add info about mBlinds
-        notBundle.putString(NotificationUtil.EXTRA_BLINDS, mBlinds)
+        //add info about currentBlinds
+        notBundle.putString(NotificationUtil.EXTRA_BLINDS, currentBlinds)
 
         val channel = if (timeToIncrease < 0)
             NotificationUtil.CHANNEL_ID_IMPORTANT
@@ -220,41 +226,10 @@ class BlindsService : Service() {
         val notification = NotificationUtil.createNotification(this, notBundle, channel)
         startForeground(NotificationUtil.NOTIFICATION_COD, notification)
 
-        val currentBlind = mBlindsList!![mRoundNum]
-        val nextBlind = mBlindsList!![mRoundNum + 1]
-        val event = BlindEvent(currentBlind, nextBlind, timeToIncrease, mTournamentInProgress)
-        EventBus.getDefault().postSticky(event)
-    }
-
-    /**
-     * Simple runnable class which call notifyTimer()
-     * every one second
-     */
-    private inner class BlindTimerRunnable : Runnable {
-        override fun run() {
-            Log.d(TAG, "run: ")
-            while (mTournamentInProgress) {
-                try {
-                    Thread.sleep(1000)
-                } catch (ex: InterruptedException) {
-                    ex.printStackTrace()
-                }
-
-                notifyTimer()
-            }
+        blindsList?.let { list ->
+            val event = BlindEvent(list[roundNum], list[roundNum + 1], timeToIncrease, tournamentInProgress)
+            EventBus.getDefault().postSticky(event)
         }
-    }
-
-    companion object {
-
-        val TAG = "BlindsService"
-
-        val START_GAME_ACTION = "start_game"
-
-        //Constants for Intent extra
-        val EXTRA_ROUND_TIME = "round_time"
-        val EXTRA_START_ROUND = "start_round"
-        val EXTRA_STRUCTURE = "structure_extra"
     }
 }
 

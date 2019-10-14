@@ -32,11 +32,9 @@ class TournamentActivity : AppCompatActivity() {
     private var interstitial: Interstitial? = null
 
     companion object {
-        val TAG = "TournamentActivity"
-        //BroadcastReceiver fields
-        val TIME_TO_INCREASE = "time_to_increase"
-        val CURRENT_BLIND = "current_blind"
-        val NEXT_BLIND = "next_blind"
+        private const val TIME_TO_INCREASE = "time_to_increase"
+        private const val CURRENT_BLIND = "current_blind"
+        private const val NEXT_BLIND = "next_blind"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -126,7 +124,7 @@ class TournamentActivity : AppCompatActivity() {
             val intent = Intent(this@TournamentActivity, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
-            interstitial!!.showAd()
+            interstitial?.showAd()
             finish()
         }
     }
