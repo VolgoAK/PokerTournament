@@ -1,7 +1,6 @@
 package com.volgoak.pokertournament
 
 import android.content.Intent
-import androidx.databinding.DataBindingUtil
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
@@ -12,18 +11,16 @@ import android.widget.Toast
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.admob.Banner
 import com.volgoak.pokertournament.admob.Interstitial
-import com.volgoak.pokertournament.databinding.ActivityTournamentBinding
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
 import com.volgoak.pokertournament.utils.NotificationUtil
+import kotlinx.android.synthetic.main.activity_tournament.*
 
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
 class TournamentActivity : AppCompatActivity() {
-
-    private lateinit var mBinder: ActivityTournamentBinding
 
     private var mStopWasClicked: Boolean = false
     private var isTimerActive: Boolean = false
@@ -41,31 +38,31 @@ class TournamentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
-        mBinder = DataBindingUtil.setContentView(this, R.layout.activity_tournament)
+        
 
         if (savedInstanceState != null) {
             val time = savedInstanceState.getString(TIME_TO_INCREASE)
-            mBinder.tvTimeToNextTournament.text = time
+            tvTimeToNext.text = time
             val blinds = savedInstanceState.getString(CURRENT_BLIND)
-            mBinder.tvCurrentBlindsTourn.text = blinds
+            tvCurrentBlinds.text = blinds
             val nextBlinds = savedInstanceState.getString(NEXT_BLIND)
-            mBinder.tvNextBlindsTour.text = nextBlinds
+            tvNextBlinds.text = nextBlinds
             //            String stateButton = savedInstanceState.getString(CHANGE_STATE_TEXT);
-            //            mBinder.btPauseTournament.setText(stateButton);
+            //            fabPause.setText(stateButton);
         }
 
         //set listener for pause/resume button
-        mBinder.btPauseTournament.setOnClickListener { v -> changeTimerState() }
-        mBinder.btPauseTournament.isEnabled = false
+        fabPause.setOnClickListener { v -> changeTimerState() }
+        fabPause.isEnabled = false
         //set listener for stop button
-        mBinder.btEndTournament.setOnClickListener { v -> tryToStopService() }
-        mBinder.btEndTournament.isEnabled = false
+        fabFinish.setOnClickListener { v -> tryToStopService() }
+        fabFinish.isEnabled = false
 
         //set font for clock
         val font = Typeface.createFromAsset(assets, "fonts/digits_bold.ttf")
-        mBinder.tvTimeToNextTournament.typeface = font
-        mBinder.tvCurrentBlindsTourn.typeface = font
-        mBinder.tvNextBlindsTour.typeface = font
+        tvTimeToNext.typeface = font
+        tvCurrentBlinds.typeface = font
+        tvNextBlinds.typeface = font
 
         if (AdsManager.initialized) {
             val bannerLL = findViewById<LinearLayout>(R.id.llBanner)
@@ -106,9 +103,9 @@ class TournamentActivity : AppCompatActivity() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putString(TIME_TO_INCREASE, mBinder.tvTimeToNextTournament.text.toString())
-        outState.putString(CURRENT_BLIND, mBinder.tvCurrentBlindsTourn.text.toString())
-        outState.putString(NEXT_BLIND, mBinder.tvNextBlindsTour.text.toString())
+        outState.putString(TIME_TO_INCREASE, tvTimeToNext.text.toString())
+        outState.putString(CURRENT_BLIND, tvCurrentBlinds.text.toString())
+        outState.putString(NEXT_BLIND, tvNextBlinds.text.toString())
         // TODO: 29.07.2017 save image for pause button
     }
 
@@ -135,19 +132,19 @@ class TournamentActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun onBlindEvent(event: BlindEvent) {
-        mBinder.tvTimeToNextTournament.text = NotificationUtil.parseTime(event.millisToNext)
-        mBinder.tvCurrentBlindsTourn.text = event.currentBlind.toString()
-        mBinder.tvNextBlindsTour.text = event.nextBlind.toString()
+        tvTimeToNext.text = NotificationUtil.parseTime(event.millisToNext)
+        tvCurrentBlinds.text = event.currentBlind.toString()
+        tvNextBlinds.text = event.nextBlind.toString()
 
         if (event.active != isTimerActive) {
             isTimerActive = event.active
-            mBinder.btPauseTournament.setImageResource(if (isTimerActive)
+            fabPause.setImageResource(if (isTimerActive)
                 R.drawable.ic_pause_black_24dp
             else
                 R.drawable.ic_play_arrow_black_24dp)
         }
 
-        mBinder.btPauseTournament.isEnabled = true
-        mBinder.btEndTournament.isEnabled = true
+        fabPause.isEnabled = true
+        fabFinish.isEnabled = true
     }
 }

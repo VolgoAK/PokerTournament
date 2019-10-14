@@ -31,12 +31,20 @@ import java.util.concurrent.TimeUnit
 class BlindsService : Service() {
 
     companion object {
-        val START_GAME_ACTION = "start_game"
+        private const val EXTRA_ROUND_TIME = "round_time"
+        private const val EXTRA_START_ROUND = "start_round"
+        private const val EXTRA_STRUCTURE = "structure_extra"
 
-        //Constants for Intent extra
-        val EXTRA_ROUND_TIME = "round_time"
-        val EXTRA_START_ROUND = "start_round"
-        val EXTRA_STRUCTURE = "structure_extra"
+        fun getStartGameIntent(
+                context: Context,
+                structure: Structure,
+                roundTime: Long,
+                startRound: Int): Intent {
+            return Intent(context, BlindsService::class.java)
+                    .putExtra(EXTRA_STRUCTURE, structure)
+                    .putExtra(EXTRA_ROUND_TIME, roundTime)
+                    .putExtra(EXTRA_START_ROUND, startRound)
+        }
     }
 
     //Thread for countdown clock
@@ -73,10 +81,7 @@ class BlindsService : Service() {
      * start time as a long
      */
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
-        // TODO: 21.03.2017 fix error with nullpointexception on intent
-        val taskAction = intent.action
-        Timber.d("TESTING onStartCommand: action $taskAction")
-        if (!tournamentInProgress && START_GAME_ACTION == taskAction) {
+        if (!tournamentInProgress) {
             startNewGame(intent)
             return Service.START_STICKY
         }

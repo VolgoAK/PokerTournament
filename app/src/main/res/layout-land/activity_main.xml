@@ -1,84 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_main"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/background"
-        tools:context="com.volgoak.pokertournament.MainActivity">
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context="com.volgoak.pokertournament.MainActivity">
 
-        <TextView
-            android:id="@+id/tv_blind_structure_main"
-            android:text="@string/blinds_structure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/title_fields_text_size"
-            android:layout_marginTop="@dimen/views_vertical_margin"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintLeft_toLeftOf="@+id/wheel_blinds_structure_main"
-            app:layout_constraintRight_toRightOf="@+id/wheel_blinds_structure_main"
-             />
+    <TextView
+        android:id="@+id/tvBlindsStructure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/views_vertical_margin"
+        android:text="@string/blinds_structure"
+        android:textSize="@dimen/title_fields_text_size"
+        app:layout_constraintLeft_toLeftOf="@+id/wheelBlindsStructure"
+        app:layout_constraintRight_toRightOf="@+id/wheelBlindsStructure"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:text="@string/round_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/tv_round_time_main"
-            android:textSize="@dimen/title_fields_text_size"
-            app:layout_constraintTop_toTopOf="@+id/tv_blind_structure_main"
-            app:layout_constraintLeft_toLeftOf="@+id/wheel_round_time_main"
-            app:layout_constraintRight_toRightOf="@+id/wheel_round_time_main"
-            />
+    <TextView
+        android:id="@+id/tvRoundTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/round_time"
+        android:textSize="@dimen/title_fields_text_size"
+        app:layout_constraintLeft_toLeftOf="@+id/wheelRoundTime"
+        app:layout_constraintRight_toRightOf="@+id/wheelRoundTime"
+        app:layout_constraintTop_toTopOf="@+id/tvBlindsStructure" />
 
-        <TextView
-            android:id="@id/tv_start_blinds_main"
-            android:text="@string/start_blind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/title_fields_text_size"
-            app:layout_constraintTop_toTopOf="@+id/tv_blind_structure_main"
-            app:layout_constraintLeft_toLeftOf="@+id/wheel_start_blind_main"
-            app:layout_constraintRight_toRightOf="@+id/wheel_start_blind_main"/>
+    <TextView
+        android:id="@id/tvStartBlinds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start_blind"
+        android:textSize="@dimen/title_fields_text_size"
+        app:layout_constraintLeft_toLeftOf="@+id/wheelStartBlinds"
+        app:layout_constraintRight_toRightOf="@+id/wheelStartBlinds"
+        app:layout_constraintTop_toTopOf="@+id/tvBlindsStructure" />
 
-        <com.aigestudio.wheelpicker.WheelPicker
-            android:id="@+id/wheel_blinds_structure_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@+id/wheel_round_time_main"
-            app:layout_constraintTop_toBottomOf="@+id/tv_blind_structure_main"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintVertical_bias="0.19" />
+    <com.aigestudio.wheelpicker.WheelPicker
+        android:id="@+id/wheelBlindsStructure"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/wheelRoundTime"
+        app:layout_constraintTop_toBottomOf="@+id/tvBlindsStructure"
+        app:layout_constraintVertical_bias="0.19" />
 
-        <com.aigestudio.wheelpicker.WheelPicker
-            android:id="@+id/wheel_round_time_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@+id/wheel_blinds_structure_main"
-            app:layout_constraintRight_toLeftOf="@+id/wheel_start_blind_main"
-            app:layout_constraintTop_toTopOf="@+id/wheel_blinds_structure_main"
-             />
+    <com.aigestudio.wheelpicker.WheelPicker
+        android:id="@+id/wheelRoundTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/wheelBlindsStructure"
+        app:layout_constraintRight_toLeftOf="@+id/wheelStartBlinds"
+        app:layout_constraintTop_toTopOf="@+id/wheelBlindsStructure" />
 
-        <com.aigestudio.wheelpicker.WheelPicker
-            android:id="@+id/wheel_start_blind_main"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintLeft_toRightOf="@+id/wheel_round_time_main"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/wheel_round_time_main" />
+    <com.aigestudio.wheelpicker.WheelPicker
+        android:id="@+id/wheelStartBlinds"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@+id/wheelRoundTime"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/wheelRoundTime" />
 
-        <com.google.android.material.floatingactionbutton.FloatingActionButton
-            app:fabSize="normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_play_arrow_black_24dp"
-            android:id="@+id/bt_start_main"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_margin="8dp"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@drawable/ic_play_arrow_black_24dp" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</layout>
+</androidx.constraintlayout.widget.ConstraintLayout>

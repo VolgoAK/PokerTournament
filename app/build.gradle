@@ -1,11 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 29
-    //buildToolsVersion "28.0.2"
-    dataBinding.enabled = "true"
+
     defaultConfig {
         applicationId "com.volgoak.pokertournament"
         minSdkVersion 18
@@ -22,7 +23,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         debug {
-            minifyEnabled true
+            multiDexEnabled true
         }
     }
 
