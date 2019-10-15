@@ -7,8 +7,8 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
 import android.os.SystemClock
-import com.volgoak.pokertournament.data.Blind
-import com.volgoak.pokertournament.data.Structure
+import com.volgoak.pokertournament.data.model.Blind
+import com.volgoak.pokertournament.data.model.Structure
 import com.volgoak.pokertournament.extensions.into
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
@@ -107,7 +107,7 @@ class BlindsService : Service() {
         //data from intent
         roundTime = intent.getLongExtra(EXTRA_ROUND_TIME, 0)
         structure = intent.getSerializableExtra(EXTRA_STRUCTURE) as Structure
-        roundNum = intent.getIntExtra(EXTRA_START_ROUND, -1)
+        roundNum = intent.getIntExtra(EXTRA_START_ROUND, 0) - 1
 
         blindsList = structure!!.blinds
 

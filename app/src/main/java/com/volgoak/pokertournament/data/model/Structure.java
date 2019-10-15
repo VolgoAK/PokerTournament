@@ -1,4 +1,6 @@
-package com.volgoak.pokertournament.data;
+package com.volgoak.pokertournament.data.model;
+
+import com.volgoak.pokertournament.data.model.Blind;
 
 import java.io.Serializable;
 import java.util.List;

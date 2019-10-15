@@ -12,6 +12,7 @@ import android.widget.Toast
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.admob.Banner
 import com.volgoak.pokertournament.admob.Interstitial
+import com.volgoak.pokertournament.screens.main.MainActivity
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
 import com.volgoak.pokertournament.utils.NotificationUtil

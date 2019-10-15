@@ -24,7 +24,7 @@
             android:name=".service.BlindsService"
             android:exported="false" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".screens.main.MainActivity">
         </activity>
         <activity
             android:name=".TournamentActivity"

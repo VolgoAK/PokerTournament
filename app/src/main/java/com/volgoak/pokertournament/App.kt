@@ -5,6 +5,7 @@ import com.google.ads.consent.ConsentInformation
 import com.google.ads.consent.DebugGeography
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.di.appModule
+import com.volgoak.pokertournament.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import timber.log.Timber
@@ -18,7 +19,7 @@ class App : Application(){
         super.onCreate()
         startKoin {
             androidContext(this@App)
-            modules(listOf(appModule))
+            modules(listOf(appModule, viewModelModule))
         }
 
         AdsManager.initAds(this)

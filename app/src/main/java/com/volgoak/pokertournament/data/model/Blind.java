@@ -1,4 +1,4 @@
-package com.volgoak.pokertournament.data;
+package com.volgoak.pokertournament.data.model;
 
 import java.io.Serializable;
 

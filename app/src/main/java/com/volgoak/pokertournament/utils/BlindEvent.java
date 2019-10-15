@@ -1,6 +1,6 @@
 package com.volgoak.pokertournament.utils;
 
-import com.volgoak.pokertournament.data.Blind;
+import com.volgoak.pokertournament.data.model.Blind;
 
 /**
  * Created by alex on 3/6/18.

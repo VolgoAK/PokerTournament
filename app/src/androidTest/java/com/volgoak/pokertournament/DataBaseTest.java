@@ -9,7 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
-import com.volgoak.pokertournament.data.Structure;
+import com.volgoak.pokertournament.data.model.Structure;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
