@@ -2,10 +2,13 @@
     <string name="app_name">HoldemTimer</string>
     <string name="start_service">Start service</string>
     <string name="blinds_is">Current blinds</string>
+    <string name="blinds_is_f">Current blinds %1s</string>
     <string name="next_blinds">Next blinds</string>
     <string name="increase_in">Increase in</string>
+    <string name="increase_in_f">Increase in %1s</string>
     <string name="blinds_increase">Blinds increase</string>
     <string name="new_blinds">New blinds</string>
+    <string name="new_blinds_f">New blinds %1s</string>
     <string name="blinds_structure">Blinds structure</string>
     <string name="round_time">Round time</string>
     <string name="start_blind">Start blind</string>

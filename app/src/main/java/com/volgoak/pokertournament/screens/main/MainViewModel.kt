@@ -3,13 +3,16 @@ package com.volgoak.pokertournament.screens.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.volgoak.pokertournament.data.DataProvider
+import com.volgoak.pokertournament.data.TournamentRepository
 import com.volgoak.pokertournament.data.model.Blind
 import com.volgoak.pokertournament.data.model.RoundTime
 import com.volgoak.pokertournament.data.model.Structure
+import com.volgoak.pokertournament.data.model.TournamentConfig
 import com.volgoak.pokertournament.utils.SingleLiveEvent
 
 class MainViewModel(
-        private val dataProvider: DataProvider
+        private val dataProvider: DataProvider,
+        private val tournamentRepository: TournamentRepository
 ) : ViewModel() {
 
     val structuresLiveData = MutableLiveData<List<Structure>>()
@@ -32,9 +35,11 @@ class MainViewModel(
     }
 
     fun onStartGameClicked(structurePosition: Int, timePosition: Int, blindPosition: Int) {
+
         val time = (timeListLiveData.value ?: dataProvider.getRoundTimes())[timePosition].time
         val structure = (structuresLiveData.value
                 ?: dataProvider.getStructures())[structurePosition]
+        tournamentRepository.beginTournament(TournamentConfig(structure, blindPosition, time))
         startGameLiveData.value = GameParams(time, structure, blindPosition)
     }
 
