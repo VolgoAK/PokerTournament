@@ -1,4 +1,4 @@
-package com.volgoak.pokertournament
+package com.volgoak.pokertournament.screens.tournament
 
 import android.content.Context
 import android.content.Intent
@@ -8,10 +8,13 @@ import android.os.Handler
 import androidx.appcompat.app.AppCompatActivity
 import android.widget.LinearLayout
 import android.widget.Toast
+import com.volgoak.pokertournament.R
 
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.admob.Banner
 import com.volgoak.pokertournament.admob.Interstitial
+import com.volgoak.pokertournament.data.model.TournamentState
+import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.screens.main.MainActivity
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
@@ -21,6 +24,7 @@ import kotlinx.android.synthetic.main.activity_tournament.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TournamentActivity : AppCompatActivity() {
 
@@ -29,6 +33,8 @@ class TournamentActivity : AppCompatActivity() {
 
     private var banner: Banner? = null
     private var interstitial: Interstitial? = null
+
+    private val viewModel by viewModel<TournamentViewModel>()
 
     companion object {
         private const val TIME_TO_INCREASE = "time_to_increase"
@@ -77,20 +83,22 @@ class TournamentActivity : AppCompatActivity() {
             interstitial = AdsManager.getInterstitial(this)
             interstitial?.loadAd()
         }
+
+        viewModel.stateLiveData.observeSafe(this, ::onStateEvent)
     }
 
     override fun onResume() {
         super.onResume()
-        if (!EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this)
+        /*if (!EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().register(this)*/
 
         banner?.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-        if (EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().unregister(this)
+       /* if (EventBus.getDefault().isRegistered(this))
+            EventBus.getDefault().unregister(this)*/
 
         banner?.onPause()
     }
@@ -150,5 +158,11 @@ class TournamentActivity : AppCompatActivity() {
 
         fabPause.isEnabled = true
         fabFinish.isEnabled = true
+    }
+
+    private fun onStateEvent(state: TournamentState) {
+        tvTimeToNext.text = state.timeLeftText
+        tvCurrentBlinds.text = state.currentBlindText
+        tvNextBlinds.text = state.nextBlindText
     }
 }

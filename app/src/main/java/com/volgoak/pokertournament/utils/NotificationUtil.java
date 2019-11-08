@@ -17,7 +17,7 @@ import androidx.core.app.NotificationCompat;
 import android.util.Log;
 
 import com.volgoak.pokertournament.R;
-import com.volgoak.pokertournament.TournamentActivity;
+import com.volgoak.pokertournament.screens.tournament.TournamentActivity;
 
 
 /**

@@ -3,7 +3,7 @@ package com.volgoak.pokertournament.screens
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.volgoak.pokertournament.screens.main.MainActivity
-import com.volgoak.pokertournament.TournamentActivity
+import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 import com.volgoak.pokertournament.service.ServiceStateRepository
 import org.koin.android.ext.android.inject
 

@@ -27,7 +27,7 @@
         <activity android:name=".screens.main.MainActivity">
         </activity>
         <activity
-            android:name=".TournamentActivity"
+            android:name=".screens.tournament.TournamentActivity"
             android:launchMode="singleTop" />
         <activity android:name=".StructureSettingsActivity" />
         <activity

@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import com.aigestudio.wheelpicker.WheelPicker
 import com.volgoak.pokertournament.AboutActivity
 import com.volgoak.pokertournament.R
-import com.volgoak.pokertournament.TournamentActivity
+import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.data.model.Structure
 import com.volgoak.pokertournament.extensions.observeSafe

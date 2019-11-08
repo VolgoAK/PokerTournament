@@ -14,7 +14,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.volgoak.pokertournament.R
-import com.volgoak.pokertournament.TournamentActivity
+import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 
 class NotificationsCreator {
 

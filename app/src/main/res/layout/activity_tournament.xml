@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/background"
     android:keepScreenOn="true"
-    tools:context="com.volgoak.pokertournament.TournamentActivity">
+    tools:context="com.volgoak.pokertournament.screens.tournament.TournamentActivity">
 
     <TextView
         android:id="@+id/tvTimeToNext"
