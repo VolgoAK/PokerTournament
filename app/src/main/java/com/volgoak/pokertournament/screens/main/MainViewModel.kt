@@ -4,10 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.volgoak.pokertournament.data.DataProvider
 import com.volgoak.pokertournament.data.TournamentRepository
-import com.volgoak.pokertournament.data.model.Blind
-import com.volgoak.pokertournament.data.model.RoundTime
-import com.volgoak.pokertournament.data.model.Structure
-import com.volgoak.pokertournament.data.model.TournamentConfig
+import com.volgoak.pokertournament.data.model.*
 import com.volgoak.pokertournament.utils.SingleLiveEvent
 
 class MainViewModel(

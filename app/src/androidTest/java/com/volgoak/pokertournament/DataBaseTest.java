@@ -9,7 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.volgoak.pokertournament.data.BlindsDatabaseAdapter;
-import com.volgoak.pokertournament.data.model.Structure;
+import com.volgoak.pokertournament.data.model.StructureLegacy;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,7 +25,7 @@ public class DataBaseTest {
     public void testGetStructures(){
         Context context = InstrumentationRegistry.getTargetContext();
         BlindsDatabaseAdapter adapter = new BlindsDatabaseAdapter(context);
-        List<Structure> structures = adapter.getStructures();
+        List<StructureLegacy> structures = adapter.getStructures();
 
         assertNotNull(structures);
         assertTrue(structures.size() > 0);

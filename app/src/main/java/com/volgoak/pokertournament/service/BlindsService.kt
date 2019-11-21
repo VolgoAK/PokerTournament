@@ -1,33 +1,23 @@
 package com.volgoak.pokertournament.service
 
-import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.os.IBinder
 import android.os.PowerManager
-import android.os.SystemClock
 import androidx.core.app.NotificationManagerCompat
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleService
 import com.volgoak.pokertournament.R
 import com.volgoak.pokertournament.data.TournamentRepository
-import com.volgoak.pokertournament.data.model.Blind
-import com.volgoak.pokertournament.data.model.BlindInfo
-import com.volgoak.pokertournament.data.model.Structure
+import com.volgoak.pokertournament.data.model.*
+import com.volgoak.pokertournament.data.toReadableText
 import com.volgoak.pokertournament.extensions.into
 import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.extensions.parseTime
-import com.volgoak.pokertournament.utils.BlindEvent
-import com.volgoak.pokertournament.utils.ControlEvent
-import com.volgoak.pokertournament.utils.NotificationUtil
 import com.volgoak.pokertournament.utils.NotificationsCreator
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.SerialDisposable
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
@@ -95,7 +85,7 @@ class BlindsService : LifecycleService() {
         tournamentRepository.blindsLD
                 .observeSafe(this, ::showTimerNotification)
 
-        tournamentRepository.nextRoundLD
+        tournamentRepository.nextRoundLiveEvent
                 .observeSafe(this, ::showLevelUpNotification)
     }
 
@@ -113,21 +103,7 @@ class BlindsService : LifecycleService() {
         super.onBind(intent)
         return null
     }
-/*if (tournamentInProgress) {
-            pauseLeftTime = increaseTime - SystemClock.elapsedRealtime()
-            tournamentInProgress = false
-            wakeLock!!.release()
-            timerDisposable.dispose()
-            notifyTimer()
-            return true
-        } else {
-            increaseTime = SystemClock.elapsedRealtime() + pauseLeftTime
-            tournamentInProgress = true
-            runTimer()
-            wakeLock!!.acquire()
-            notifyTimer()
-            return false
-        }*/
+
     private fun onTournamentStateChanged(inProgress: Boolean) {
         if(inProgress) {
             if(!wakeLock.isHeld) wakeLock.acquire()
@@ -165,7 +141,7 @@ class BlindsService : LifecycleService() {
         val notification = notificationCreator.createNotification(
                 this,
                 getString(R.string.blinds_increase),
-                getString(R.string.new_blinds_f, blind.toString()),
+                getString(R.string.new_blinds_f, blind.toReadableText()),
                 NotificationsCreator.Channels.IMPORTANT,
                 NotificationsCreator.PendingScreen.TOURNAMENT
         )

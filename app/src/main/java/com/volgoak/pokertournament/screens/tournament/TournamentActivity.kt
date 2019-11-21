@@ -13,7 +13,7 @@ import com.volgoak.pokertournament.R
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.admob.Banner
 import com.volgoak.pokertournament.admob.Interstitial
-import com.volgoak.pokertournament.data.model.TournamentState
+import com.volgoak.pokertournament.data.model.TournamentScreenState
 import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.screens.main.MainActivity
 import com.volgoak.pokertournament.utils.BlindEvent
@@ -62,11 +62,9 @@ class TournamentActivity : AppCompatActivity() {
         }
 
         //set listener for pause/resume button
-        fabPause.setOnClickListener { v -> changeTimerState() }
-        fabPause.isEnabled = false
+        fabPause.setOnClickListener { viewModel.toggleTournamentState() }
         //set listener for stop button
         fabFinish.setOnClickListener { v -> tryToStopService() }
-        fabFinish.isEnabled = false
 
         //set font for clock
         val font = Typeface.createFromAsset(assets, "fonts/digits_bold.ttf")
@@ -155,12 +153,9 @@ class TournamentActivity : AppCompatActivity() {
             else
                 R.drawable.ic_play_arrow_black_24dp)
         }
-
-        fabPause.isEnabled = true
-        fabFinish.isEnabled = true
     }
 
-    private fun onStateEvent(state: TournamentState) {
+    private fun onStateEvent(state: TournamentScreenState) {
         tvTimeToNext.text = state.timeLeftText
         tvCurrentBlinds.text = state.currentBlindText
         tvNextBlinds.text = state.nextBlindText

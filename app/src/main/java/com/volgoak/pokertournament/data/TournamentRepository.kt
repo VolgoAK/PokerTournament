@@ -1,10 +1,8 @@
 package com.volgoak.pokertournament.data
 
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import com.volgoak.pokertournament.data.model.Blind
-import com.volgoak.pokertournament.data.model.BlindInfo
-import com.volgoak.pokertournament.data.model.Structure
-import com.volgoak.pokertournament.data.model.TournamentConfig
+import com.volgoak.pokertournament.data.model.*
 import com.volgoak.pokertournament.utils.SingleLiveEvent
 
 class TournamentRepository {
@@ -15,27 +13,54 @@ class TournamentRepository {
     private var pauseLeftTime: Long = 0
     private lateinit var blindsList: MutableList<Blind>
     private lateinit var structure: Structure
-    private lateinit var currentBlinds: String
-    private lateinit var nextBlinds: String
+    private lateinit var currentBlinds: Blind
+    private lateinit var nextBlinds: Blind
 
     private val time: Long
         get() = System.currentTimeMillis()
 
-    val nextRoundLD = SingleLiveEvent<Blind>()
+    val nextRoundLiveEvent = SingleLiveEvent<Blind>()
     val blindsLD = MutableLiveData<BlindInfo>()
+    val currentBlindsLD = MutableLiveData<CurrentBlindsInfo>()
+    val tournamentInfoLD = MediatorLiveData<TournamentInfo>()
+    private val timeToIncreaseLD = MutableLiveData<Long>()
+
     val tournamentInProgressLD = MutableLiveData<Boolean>(false)
+
+    init {
+        with(tournamentInfoLD) {
+            addSource(tournamentInProgressLD) { inProgress ->
+                value = (value ?: TournamentInfo()).copy(inProgress = inProgress)
+            }
+
+            addSource(currentBlindsLD) {
+                value = (value ?: TournamentInfo()).copy(
+                        currentBlinds = currentBlinds,
+                        nextBlinds = nextBlinds
+                )
+            }
+
+            addSource(timeToIncreaseLD) {time ->
+                value = (value ?: TournamentInfo()).copy(
+                        timeToIncrease = time
+                )
+            }
+        }
+    }
 
     fun beginTournament(config: TournamentConfig) {
         structure = config.structure
         roundNum = config.firstRoundIndex
-        blindsList = structure.blinds
+        blindsList = structure.blinds.toMutableList()
         checkBlinds()
-        currentBlinds = blindsList[config.firstRoundIndex].toString()
-        nextBlinds = blindsList[config.firstRoundIndex + 1].toString()
+        currentBlinds = blindsList[config.firstRoundIndex]
+        nextBlinds = blindsList[config.firstRoundIndex + 1]
         roundTime = config.roundTime
 
         increaseTime = time + roundTime
         tournamentInProgressLD.postValue(true)
+        currentBlindsLD.postValue(CurrentBlindsInfo(currentBlinds, nextBlinds))
+        timeToIncreaseLD.postValue(roundTime)
     }
 
     fun notifyTimer() {
@@ -44,18 +69,29 @@ class TournamentRepository {
             if (timeToIncrease < 0) startNextRound()
 
             blindsLD.postValue(
-                    BlindInfo(currentBlinds, nextBlinds, timeToIncrease,
+                    BlindInfo(currentBlinds.toString(), nextBlinds.toString(), timeToIncrease,
                             tournamentInProgressLD.value == true)
             )
+
+            currentBlindsLD.postValue(CurrentBlindsInfo(currentBlinds, nextBlinds))
+            timeToIncreaseLD.postValue(timeToIncrease)
         }
     }
 
-    fun pause() {
+    fun toggleState() {
+        if(tournamentInProgressLD.value == true) {
+            pause()
+        } else {
+            resume()
+        }
+    }
+
+    private fun pause() {
         tournamentInProgressLD.postValue(false)
         pauseLeftTime = increaseTime - time
     }
 
-    fun resume() {
+    private fun resume() {
         tournamentInProgressLD.postValue(true)
         increaseTime = time + roundTime
         notifyTimer()
@@ -64,11 +100,12 @@ class TournamentRepository {
     private fun startNextRound() {
         checkBlinds()
         roundNum++
-        currentBlinds = blindsList[roundNum].toString()
-        nextBlinds = blindsList[roundNum + 1].toString()
+        currentBlinds = blindsList[roundNum]
+        nextBlinds = blindsList[roundNum + 1]
         increaseTime = time + roundTime
 
-        nextRoundLD.postValue(blindsList[roundNum])
+        nextRoundLiveEvent.postValue(blindsList[roundNum])
+        currentBlindsLD.postValue(CurrentBlindsInfo(currentBlinds, nextBlinds))
     }
 
     private fun checkBlinds() {
@@ -76,9 +113,7 @@ class TournamentRepository {
             val currentBlind = blindsList[blindsList.size - 1]
             val smallBlind = currentBlind.sb * 2
             val bigBlind = smallBlind * 2
-            val newBlind = Blind()
-            newBlind.sb = smallBlind
-            newBlind.bb = bigBlind
+            val newBlind = Blind(smallBlind, bigBlind)
             blindsList.add(newBlind)
         }
     }

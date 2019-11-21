@@ -1,12 +1,10 @@
 package com.volgoak.pokertournament.data
 
 import android.content.Context
-
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.volgoak.pokertournament.data.model.RoundTime
 import com.volgoak.pokertournament.data.model.Structure
-
 import java.io.IOException
 
 /**

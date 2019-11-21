@@ -13,6 +13,7 @@ import com.volgoak.pokertournament.R
 import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.data.model.Structure
+import com.volgoak.pokertournament.data.toReadableText
 import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.service.BlindsService
 import kotlinx.android.synthetic.main.activity_main.*
@@ -55,10 +56,10 @@ class MainActivity : AppCompatActivity() {
             wheelRoundTime.data = timeList.map { it.text }
         }
         viewModel.structuresLiveData.observeSafe(this) { structures ->
-            wheelBlindsStructure.data = structures
+            wheelBlindsStructure.data = structures.map { it.name }
         }
         viewModel.blindsListLiveData.observeSafe(this) { blinds ->
-            wheelStartBlinds.data = blinds
+            wheelStartBlinds.data = blinds.map { it.toReadableText() }
         }
         viewModel.startGameLiveData.observeSafe(this) { gameParams ->
             startGame(gameParams.time, gameParams.structure, gameParams.blindsIndex)

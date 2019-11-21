@@ -6,7 +6,7 @@ import java.io.Serializable;
  * Created by alex on 3/5/18.
  */
 
-public class Blind implements Serializable{
+public class BlindLegacy implements Serializable{
     private int sb;
     private int bb;
     private int ante;
