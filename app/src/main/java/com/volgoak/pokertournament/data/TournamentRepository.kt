@@ -20,9 +20,8 @@ class TournamentRepository {
         get() = System.currentTimeMillis()
 
     val nextRoundLiveEvent = SingleLiveEvent<Blind>()
-    val blindsLD = MutableLiveData<BlindInfo>()
-    val currentBlindsLD = MutableLiveData<CurrentBlindsInfo>()
     val tournamentInfoLD = MediatorLiveData<TournamentInfo>()
+    private val currentBlindsLD = MutableLiveData<CurrentBlindsInfo>()
     private val timeToIncreaseLD = MutableLiveData<Long>()
 
     val tournamentInProgressLD = MutableLiveData<Boolean>(false)
@@ -68,11 +67,6 @@ class TournamentRepository {
             val timeToIncrease = increaseTime - time
             if (timeToIncrease < 0) startNextRound()
 
-            blindsLD.postValue(
-                    BlindInfo(currentBlinds.toString(), nextBlinds.toString(), timeToIncrease,
-                            tournamentInProgressLD.value == true)
-            )
-
             currentBlindsLD.postValue(CurrentBlindsInfo(currentBlinds, nextBlinds))
             timeToIncreaseLD.postValue(timeToIncrease)
         }
@@ -93,7 +87,7 @@ class TournamentRepository {
 
     private fun resume() {
         tournamentInProgressLD.postValue(true)
-        increaseTime = time + roundTime
+        increaseTime = time + pauseLeftTime
         notifyTimer()
     }
 

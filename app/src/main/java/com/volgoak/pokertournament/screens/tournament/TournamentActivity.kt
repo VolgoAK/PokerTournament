@@ -5,22 +5,21 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
 import android.os.Handler
-import androidx.appcompat.app.AppCompatActivity
 import android.widget.LinearLayout
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.volgoak.pokertournament.R
-
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.admob.Banner
 import com.volgoak.pokertournament.admob.Interstitial
 import com.volgoak.pokertournament.data.model.TournamentScreenState
 import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.screens.main.MainActivity
+import com.volgoak.pokertournament.service.BlindsService
 import com.volgoak.pokertournament.utils.BlindEvent
 import com.volgoak.pokertournament.utils.ControlEvent
 import com.volgoak.pokertournament.utils.NotificationUtil
 import kotlinx.android.synthetic.main.activity_tournament.*
-
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -48,19 +47,6 @@ class TournamentActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tournament)
 
-        
-
-        if (savedInstanceState != null) {
-            val time = savedInstanceState.getString(TIME_TO_INCREASE)
-            tvTimeToNext.text = time
-            val blinds = savedInstanceState.getString(CURRENT_BLIND)
-            tvCurrentBlinds.text = blinds
-            val nextBlinds = savedInstanceState.getString(NEXT_BLIND)
-            tvNextBlinds.text = nextBlinds
-            //            String stateButton = savedInstanceState.getString(CHANGE_STATE_TEXT);
-            //            fabPause.setText(stateButton);
-        }
-
         //set listener for pause/resume button
         fabPause.setOnClickListener { viewModel.toggleTournamentState() }
         //set listener for stop button
@@ -87,17 +73,11 @@ class TournamentActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        /*if (!EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().register(this)*/
-
         banner?.onResume()
     }
 
     override fun onPause() {
         super.onPause()
-       /* if (EventBus.getDefault().isRegistered(this))
-            EventBus.getDefault().unregister(this)*/
-
         banner?.onPause()
     }
 
@@ -111,14 +91,6 @@ class TournamentActivity : AppCompatActivity() {
         tryToStopService()
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        outState.putString(TIME_TO_INCREASE, tvTimeToNext.text.toString())
-        outState.putString(CURRENT_BLIND, tvCurrentBlinds.text.toString())
-        outState.putString(NEXT_BLIND, tvNextBlinds.text.toString())
-        // TODO: 29.07.2017 save image for pause button
-    }
-
     //call when stop button clicked. If clicked second time in five seconds it stops service
     //else run timer
     private fun tryToStopService() {
@@ -127,7 +99,7 @@ class TournamentActivity : AppCompatActivity() {
             mStopWasClicked = true
             Handler().postDelayed({ mStopWasClicked = false }, 3000)
         } else {
-            EventBus.getDefault().post(ControlEvent(ControlEvent.Type.STOP))
+            startService(BlindsService.getStopIntent(this))
             val intent = Intent(this@TournamentActivity, MainActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             startActivity(intent)
@@ -159,5 +131,11 @@ class TournamentActivity : AppCompatActivity() {
         tvTimeToNext.text = state.timeLeftText
         tvCurrentBlinds.text = state.currentBlindText
         tvNextBlinds.text = state.nextBlindText
+        fabPause.setImageResource(
+                if (state.inProgress)
+                    R.drawable.ic_play_arrow_black_24dp
+                else
+                    R.drawable.ic_pause_black_24dp
+        )
     }
 }

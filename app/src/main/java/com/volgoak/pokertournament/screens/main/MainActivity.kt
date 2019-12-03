@@ -10,11 +10,11 @@ import androidx.core.content.ContextCompat
 import com.aigestudio.wheelpicker.WheelPicker
 import com.volgoak.pokertournament.AboutActivity
 import com.volgoak.pokertournament.R
-import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 import com.volgoak.pokertournament.admob.AdsManager
 import com.volgoak.pokertournament.data.model.Structure
 import com.volgoak.pokertournament.data.toReadableText
 import com.volgoak.pokertournament.extensions.observeSafe
+import com.volgoak.pokertournament.screens.tournament.TournamentActivity
 import com.volgoak.pokertournament.service.BlindsService
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -61,9 +61,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.blindsListLiveData.observeSafe(this) { blinds ->
             wheelStartBlinds.data = blinds.map { it.toReadableText() }
         }
-        viewModel.startGameLiveData.observeSafe(this) { gameParams ->
-            startGame(gameParams.time, gameParams.structure, gameParams.blindsIndex)
-        }
+        viewModel.startGameLiveData.observeSafe(this) { startGame() }
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
@@ -86,15 +84,8 @@ class MainActivity : AppCompatActivity() {
         outState.putInt(SAVED_TIME_POSITION, wheelRoundTime.currentItemPosition)
     }
 
-    private fun startGame(roundTime: Long, structure: Structure, blindsIndex: Int) {
-        val intent = BlindsService.getStartGameIntent(
-                this,
-                structure,
-                roundTime,
-                blindsIndex
-        )
-        ContextCompat.startForegroundService(this, intent)
-
+    private fun startGame() {
+        ContextCompat.startForegroundService(this, BlindsService.getStartGameIntent(this))
         startActivity(TournamentActivity.getIntent(this))
         finish()
     }

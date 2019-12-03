@@ -31,35 +31,28 @@ import java.util.concurrent.TimeUnit
 
 class BlindsService : LifecycleService() {
 
-    companion object {
-        private const val EXTRA_ROUND_TIME = "round_time"
-        private const val EXTRA_START_ROUND = "start_round"
-        private const val EXTRA_STRUCTURE = "structure_extra"
+    enum class ServiceAction(val action: String) {
+        RUN_SERVICE("run_service"),
+        STOP_SERVICE("stop_service")
+    }
 
+    companion object {
         private const val CODE_NOTIFICATION_PROGRESS = 155
         private const val CODE_NOTIFICATION_LEVEL_UP = 156
 
-        fun getStartGameIntent(
-                context: Context,
-                structure: Structure,
-                roundTime: Long,
-                startRound: Int): Intent {
+        fun getStartGameIntent(context: Context)
+                = createIntent(context, ServiceAction.RUN_SERVICE)
+
+        fun getStopIntent(context: Context)
+                = createIntent(context, ServiceAction.STOP_SERVICE)
+
+        private fun createIntent(context: Context, action: ServiceAction): Intent {
             return Intent(context, BlindsService::class.java)
-                    .putExtra(EXTRA_STRUCTURE, structure)
-                    .putExtra(EXTRA_ROUND_TIME, roundTime)
-                    .putExtra(EXTRA_START_ROUND, startRound)
+                    .setAction(action.action)
         }
     }
 
     private val stateRepository: ServiceStateRepository by inject()
-
-    /*private var roundNum: Int = 0
-    private var roundTime: Long = 0
-    private var increaseTime: Long = 0
-    private var pauseLeftTime: Long = 0
-    private var blindsList: MutableList<Blind>? = null
-    private var currentBlinds: String? = null
-    private var structure: Structure? = null*/
 
     private val timerDisposable = SerialDisposable()
 
@@ -73,7 +66,7 @@ class BlindsService : LifecycleService() {
     override fun onCreate() {
         super.onCreate()
         val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "My log")
+        wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "pokerTimer:wakelock")
         stateRepository.serviceRunning = true
         initSubscriptions()
     }
@@ -82,8 +75,8 @@ class BlindsService : LifecycleService() {
         tournamentRepository.tournamentInProgressLD
                 .observeSafe(this, ::onTournamentStateChanged)
 
-        tournamentRepository.blindsLD
-                .observeSafe(this, ::showTimerNotification)
+        tournamentRepository.tournamentInfoLD
+                .observeSafe(this) { showTimerNotification(it)}
 
         tournamentRepository.nextRoundLiveEvent
                 .observeSafe(this, ::showLevelUpNotification)
@@ -91,7 +84,20 @@ class BlindsService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        return Service.START_STICKY
+        return when(intent.action) {
+            ServiceAction.RUN_SERVICE.action -> {
+                showTimerNotification(TournamentInfo(), true)
+                Service.START_STICKY
+            }
+            ServiceAction.STOP_SERVICE.action -> {
+                stopForeground(true)
+                stopSelf()
+                Service.START_NOT_STICKY
+            }
+            else -> {
+                throw RuntimeException("Unknown intent action ${intent.action}")
+            }
+        }
     }
 
     override fun onDestroy() {
@@ -111,7 +117,7 @@ class BlindsService : LifecycleService() {
             tournamentRepository.notifyTimer()
         } else {
             if(wakeLock.isHeld) wakeLock.release()
-            timerDisposable.dispose()
+            timerDisposable.get()?.dispose()
         }
     }
 
@@ -125,16 +131,21 @@ class BlindsService : LifecycleService() {
                 }) into timerDisposable
     }
 
-    private fun showTimerNotification(info: BlindInfo) {
+    private fun showTimerNotification(info: TournamentInfo, startForeground: Boolean = false) {
         val notification = notificationCreator.createNotification(
                 this,
-                getString(R.string.blinds_is_f, info.currentBlinds),
+                getString(R.string.blinds_is_f, info.currentBlinds.toReadableText()),
                 getString(R.string.increase_in_f, info.timeToIncrease.parseTime()),
                 NotificationsCreator.Channels.SILENT,
                 NotificationsCreator.PendingScreen.TOURNAMENT
         )
 
-        startForeground(CODE_NOTIFICATION_PROGRESS, notification)
+        if(startForeground) {
+            startForeground(CODE_NOTIFICATION_PROGRESS, notification)
+        } else {
+            NotificationManagerCompat.from(this)
+                    .notify(CODE_NOTIFICATION_PROGRESS, notification)
+        }
     }
 
     private fun showLevelUpNotification(blind: Blind) {
