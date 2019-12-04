@@ -16,30 +16,18 @@ import com.volgoak.pokertournament.data.model.TournamentScreenState
 import com.volgoak.pokertournament.extensions.observeSafe
 import com.volgoak.pokertournament.screens.main.MainActivity
 import com.volgoak.pokertournament.service.BlindsService
-import com.volgoak.pokertournament.utils.BlindEvent
-import com.volgoak.pokertournament.utils.ControlEvent
-import com.volgoak.pokertournament.utils.NotificationUtil
 import kotlinx.android.synthetic.main.activity_tournament.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class TournamentActivity : AppCompatActivity() {
 
     private var mStopWasClicked: Boolean = false
-    private var isTimerActive: Boolean = false
-
     private var banner: Banner? = null
     private var interstitial: Interstitial? = null
 
     private val viewModel by viewModel<TournamentViewModel>()
 
     companion object {
-        private const val TIME_TO_INCREASE = "time_to_increase"
-        private const val CURRENT_BLIND = "current_blind"
-        private const val NEXT_BLIND = "next_blind"
-
         fun getIntent(context: Context) = Intent(context, TournamentActivity::class.java)
     }
 
@@ -108,34 +96,15 @@ class TournamentActivity : AppCompatActivity() {
         }
     }
 
-    private fun changeTimerState() {
-        EventBus.getDefault().post(ControlEvent(ControlEvent.Type.CHANGE_STATE))
-    }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onBlindEvent(event: BlindEvent) {
-        tvTimeToNext.text = NotificationUtil.parseTime(event.millisToNext)
-        tvCurrentBlinds.text = event.currentBlind.toString()
-        tvNextBlinds.text = event.nextBlind.toString()
-
-        if (event.active != isTimerActive) {
-            isTimerActive = event.active
-            fabPause.setImageResource(if (isTimerActive)
-                R.drawable.ic_pause_black_24dp
-            else
-                R.drawable.ic_play_arrow_black_24dp)
-        }
-    }
-
     private fun onStateEvent(state: TournamentScreenState) {
         tvTimeToNext.text = state.timeLeftText
         tvCurrentBlinds.text = state.currentBlindText
         tvNextBlinds.text = state.nextBlindText
         fabPause.setImageResource(
                 if (state.inProgress)
-                    R.drawable.ic_play_arrow_black_24dp
-                else
                     R.drawable.ic_pause_black_24dp
+                else
+                    R.drawable.ic_play_arrow_black_24dp
         )
     }
 }
